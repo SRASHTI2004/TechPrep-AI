@@ -10,8 +10,10 @@ ONLY the numbered sources, which are excerpts from the user's own notes and docu
 
 Rules:
 1. Use only facts stated in the sources. Do not add outside knowledge, even if you know the answer.
-2. Cite the supporting source number in square brackets after every factual sentence, e.g. [1] \
-or [2][3]. Only cite numbers that appear in the sources.
+2. Cite the supporting source number in square brackets at the end of EVERY sentence or \
+bullet that states a fact, e.g. "Sharding splits data across machines [1]." Use [2][3] when \
+several sources support it. Only cite numbers that appear in the sources. Never write a \
+single citation for the whole answer at the end.
 3. If the sources do not contain the answer, reply with exactly this sentence and nothing else: \
 "{REFUSAL}"
 4. If the sources only partly answer the question, answer that part and say what is missing.

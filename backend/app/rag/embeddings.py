@@ -29,11 +29,17 @@ class Embedder(Protocol):
 
 
 class FastEmbedEmbedder:
-    def __init__(self, model_name: str, query_prefix: str = "", cache_dir: str | None = None):
+    def __init__(
+        self,
+        model_name: str,
+        query_prefix: str = "",
+        cache_dir: str | None = None,
+        threads: int | None = None,
+    ):
         from fastembed import TextEmbedding
 
         log.info("loading_embedding_model", model=model_name)
-        self._model = TextEmbedding(model_name=model_name, cache_dir=cache_dir)
+        self._model = TextEmbedding(model_name=model_name, cache_dir=cache_dir, threads=threads)
         self._lock = threading.Lock()  # ONNX session is shared across request threads
         self.model_name = model_name
         self.query_prefix = query_prefix
@@ -90,6 +96,7 @@ def get_embedder() -> Embedder:
             settings.embedding_model,
             query_prefix=settings.embedding_query_prefix,
             cache_dir=settings.model_cache_dir,
+            threads=settings.onnx_threads,
         )
     if embedder.dim != settings.embedding_dim:
         raise RuntimeError(

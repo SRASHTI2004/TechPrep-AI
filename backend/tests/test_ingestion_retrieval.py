@@ -126,3 +126,30 @@ def test_reingest_replaces_chunks_without_duplicates(client, auth_headers, db):
     after = client.get(f"/api/v1/documents/{doc['id']}", headers=auth_headers).json()
     assert after["status"] == "ready" and after["num_chunks"] == before
     assert ChunkRepository(db).count_for_owner(_user_id(client, auth_headers)) == before
+
+
+class KeywordReranker:
+    """Fake cross-encoder: relevance = fraction of query words present in the text."""
+
+    def __init__(self):
+        self.calls: list[int] = []
+
+    def score(self, query, texts):
+        self.calls.append(len(texts))
+        words = set(query.lower().split())
+        return [len(words & set(t.lower().split())) / len(words) for t in texts]
+
+
+def test_rerank_path_reorders_limits_candidates_and_sets_scores(client, auth_headers, db):
+    _upload(client, auth_headers, "db.md", NOTES, "text/markdown")
+    owner = _user_id(client, auth_headers)
+    reranker = KeywordReranker()
+    result = Retriever(db, reranker=reranker).search(
+        owner, "master replicas promoted", rerank=True, rerank_candidates=3, top_k=2
+    )
+    assert result.reranked and reranker.calls == [3]  # only the top fused candidates
+    assert len(result.chunks) == 2
+    assert result.chunks[0].section == "Databases > Replication"
+    assert result.chunks[0].score == result.chunks[0].rerank_score
+    assert result.chunks[0].rerank_score >= result.chunks[1].rerank_score
+    assert "rerank_ms" in result.timings_ms

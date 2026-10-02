@@ -27,11 +27,11 @@ def _sigmoid(x: float) -> float:
 
 
 class CrossEncoderReranker:
-    def __init__(self, model_name: str, cache_dir: str | None = None):
+    def __init__(self, model_name: str, cache_dir: str | None = None, threads: int | None = None):
         from fastembed.rerank.cross_encoder import TextCrossEncoder
 
         log.info("loading_reranker_model", model=model_name)
-        self._model = TextCrossEncoder(model_name=model_name, cache_dir=cache_dir)
+        self._model = TextCrossEncoder(model_name=model_name, cache_dir=cache_dir, threads=threads)
         self._lock = threading.Lock()
 
     def score(self, query: str, texts: list[str]) -> list[float]:
@@ -44,4 +44,6 @@ class CrossEncoderReranker:
 @lru_cache
 def get_reranker() -> Reranker:
     settings = get_settings()
-    return CrossEncoderReranker(settings.reranker_model, cache_dir=settings.model_cache_dir)
+    return CrossEncoderReranker(
+        settings.reranker_model, cache_dir=settings.model_cache_dir, threads=settings.onnx_threads
+    )

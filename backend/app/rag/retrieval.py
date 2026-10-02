@@ -45,9 +45,9 @@ class RetrievedChunk:
         """Relevance used for the "I don't know" gate."""
         return self.rerank_score if self.rerank_score is not None else self.similarity
 
-    @property
-    def rerank_text(self) -> str:
-        return f"{self.section}\n{self.content}" if self.section else self.content
+    def rerank_text(self, max_chars: int) -> str:
+        text = f"{self.section}\n{self.content}" if self.section else self.content
+        return text[:max_chars]
 
 
 @dataclass
@@ -101,7 +101,7 @@ SELECT c.id, c.document_id, d.filename, c.content, c.section, c.page, c.chunk_in
   JOIN chunks c ON c.id = f.id
   JOIN documents d ON d.id = c.document_id
  ORDER BY f.rrf DESC, c.id
- LIMIT :k
+ LIMIT :final_k
 """
 
 _SOURCES = {
@@ -138,13 +138,16 @@ class Retriever:
         rerank: bool | None = None,
         top_k: int | None = None,
         candidates: int | None = None,
+        rerank_candidates: int | None = None,
         document_ids: list[UUID] | None = None,
     ) -> RetrievalResult:
         s = self.settings
         mode = mode or s.retrieval_mode
         rerank = s.reranker_enabled if rerank is None else rerank
         top_k = top_k or s.top_k
-        k = max(candidates or s.retrieval_candidates, top_k)
+        k = max(candidates or s.retrieval_candidates, top_k)  # per retriever (vector / keyword)
+        # How many fused results to return: the reranker only sees the best few (CPU cost).
+        final_k = max(rerank_candidates or s.rerank_candidates, top_k) if rerank else top_k
         timings: dict[str, int] = {}
 
         t0 = time.perf_counter()
@@ -160,6 +163,7 @@ class Retriever:
             "qvec": _vector_literal(qvec),
             "owner_id": owner_id,
             "k": k,
+            "final_k": final_k,
             "rrf_k": s.rrf_k,
         }
         if document_ids:
@@ -187,7 +191,8 @@ class Retriever:
 
         if rerank and chunks:
             t0 = time.perf_counter()
-            scores = self.reranker.score(query, [c.rerank_text for c in chunks])
+            texts = [c.rerank_text(s.rerank_max_chars) for c in chunks]
+            scores = self.reranker.score(query, texts)
             for chunk, score in zip(chunks, scores, strict=True):
                 chunk.rerank_score = score
             chunks.sort(key=lambda c: c.rerank_score or 0.0, reverse=True)

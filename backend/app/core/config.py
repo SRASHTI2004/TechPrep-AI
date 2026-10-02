@@ -63,6 +63,7 @@ class Settings(BaseSettings):
     reranker_enabled: bool = True
     reranker_model: str = "Xenova/ms-marco-MiniLM-L-6-v2"
     warmup_models: bool = False
+    onnx_threads: int | None = None  # None = ONNX default (all cores); try physical core count
 
     # --- Chunking ---
     chunk_size: int = 1000
@@ -71,7 +72,9 @@ class Settings(BaseSettings):
 
     # --- Retrieval ---
     retrieval_mode: Literal["hybrid", "vector", "keyword"] = "hybrid"
-    retrieval_candidates: int = 20
+    retrieval_candidates: int = 20  # top-k from each of vector and keyword search
+    rerank_candidates: int = 12  # fused results the cross-encoder rescores (~80 ms each on CPU)
+    rerank_max_chars: int = 700  # cross-encoder cost grows with length; the start is enough
     top_k: int = 5
     rrf_k: int = 60
     # "I don't know" gate: below these scores, we don't call the LLM.
