@@ -54,3 +54,6 @@ ignore = ["B008"]  # FastAPI's Depends() in defaults is idiomatic
 testpaths = ["tests"]
 addopts = "-q"
 filterwarnings = ["ignore::DeprecationWarning", "ignore:Using `httpx` with:Warning"]
+
+[tool.ruff.lint.per-file-ignores]
+"eval/run_eval.py" = ["E501"]  # Markdown report templates

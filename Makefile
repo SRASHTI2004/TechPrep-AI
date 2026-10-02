@@ -35,7 +35,7 @@ web:
 	cd frontend && npm run dev
 
 eval:
-	cd backend && uv run python -m eval.run_eval --ablation
+	cd backend && uv run python -m eval.run_eval --chunk-sizes 500,1000,1600
 
 up-lite:
 	docker compose up --build

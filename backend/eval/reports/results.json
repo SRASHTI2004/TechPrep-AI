@@ -1,0 +1,1233 @@
+{
+  "timestamp": "2026-10-02T08:35:39+00:00",
+  "chunk_ablation": [
+    {
+      "chunk_size": 500,
+      "chunks": 337,
+      "hit@5": 0.976,
+      "recall@5": 0.976,
+      "mrr@5": 0.891
+    },
+    {
+      "chunk_size": 1000,
+      "chunks": 212,
+      "hit@5": 1.0,
+      "recall@5": 1.0,
+      "mrr@5": 0.919
+    },
+    {
+      "chunk_size": 1600,
+      "chunks": 180,
+      "hit@5": 1.0,
+      "recall@5": 1.0,
+      "mrr@5": 0.919
+    }
+  ],
+  "corpus_chunks": 212,
+  "settings": {
+    "embedding_model": "BAAI/bge-small-en-v1.5",
+    "reranker_model": "Xenova/ms-marco-MiniLM-L-6-v2",
+    "chunk_size": 1000,
+    "chunk_overlap": 150,
+    "top_k": 5,
+    "retrieval_candidates": 20,
+    "rerank_candidates": 12,
+    "rerank_min_score": 0.02,
+    "vector_min_similarity": 0.62,
+    "groq_model": "openai/gpt-oss-20b"
+  },
+  "retrieval": {
+    "k": 5,
+    "n_answerable": 42,
+    "n_unanswerable": 8,
+    "configs": [
+      {
+        "config": "vector only",
+        "hit@1": 0.905,
+        "hit@5": 0.952,
+        "recall@5": 0.952,
+        "mrr@5": 0.925,
+        "hit@5_paraphrased": 0.882,
+        "latency_p50_ms": 104,
+        "latency_p95_ms": 249,
+        "gate_default": {
+          "threshold": 0.62,
+          "refusal_accuracy": 0.5,
+          "false_refusal_rate": 0.024
+        },
+        "gate_sweep": [
+          {
+            "threshold": 0.55,
+            "refusal_accuracy": 0.25,
+            "false_refusal_rate": 0.0
+          },
+          {
+            "threshold": 0.6,
+            "refusal_accuracy": 0.25,
+            "false_refusal_rate": 0.0
+          },
+          {
+            "threshold": 0.62,
+            "refusal_accuracy": 0.5,
+            "false_refusal_rate": 0.024
+          },
+          {
+            "threshold": 0.65,
+            "refusal_accuracy": 0.875,
+            "false_refusal_rate": 0.024
+          },
+          {
+            "threshold": 0.7,
+            "refusal_accuracy": 1.0,
+            "false_refusal_rate": 0.095
+          },
+          {
+            "threshold": 0.75,
+            "refusal_accuracy": 1.0,
+            "false_refusal_rate": 0.238
+          }
+        ],
+        "misses@5": [
+          "hard-09",
+          "hard-10"
+        ]
+      },
+      {
+        "config": "keyword only (FTS)",
+        "hit@1": 0.667,
+        "hit@5": 0.857,
+        "recall@5": 0.857,
+        "mrr@5": 0.741,
+        "hit@5_paraphrased": 0.647,
+        "latency_p50_ms": 101,
+        "latency_p95_ms": 129,
+        "gate_default": {
+          "threshold": 0.62,
+          "refusal_accuracy": 0.875,
+          "false_refusal_rate": 0.071
+        },
+        "gate_sweep": [
+          {
+            "threshold": 0.55,
+            "refusal_accuracy": 0.625,
+            "false_refusal_rate": 0.024
+          },
+          {
+            "threshold": 0.6,
+            "refusal_accuracy": 0.625,
+            "false_refusal_rate": 0.048
+          },
+          {
+            "threshold": 0.62,
+            "refusal_accuracy": 0.875,
+            "false_refusal_rate": 0.071
+          },
+          {
+            "threshold": 0.65,
+            "refusal_accuracy": 0.875,
+            "false_refusal_rate": 0.119
+          },
+          {
+            "threshold": 0.7,
+            "refusal_accuracy": 1.0,
+            "false_refusal_rate": 0.214
+          },
+          {
+            "threshold": 0.75,
+            "refusal_accuracy": 1.0,
+            "false_refusal_rate": 0.429
+          }
+        ],
+        "misses@5": [
+          "hard-04",
+          "hard-05",
+          "hard-06",
+          "hard-08",
+          "hard-09",
+          "hard-10"
+        ]
+      },
+      {
+        "config": "hybrid (RRF)",
+        "hit@1": 0.833,
+        "hit@5": 0.929,
+        "recall@5": 0.929,
+        "mrr@5": 0.875,
+        "hit@5_paraphrased": 0.824,
+        "latency_p50_ms": 108,
+        "latency_p95_ms": 146,
+        "gate_default": {
+          "threshold": 0.62,
+          "refusal_accuracy": 0.625,
+          "false_refusal_rate": 0.024
+        },
+        "gate_sweep": [
+          {
+            "threshold": 0.55,
+            "refusal_accuracy": 0.25,
+            "false_refusal_rate": 0.0
+          },
+          {
+            "threshold": 0.6,
+            "refusal_accuracy": 0.375,
+            "false_refusal_rate": 0.0
+          },
+          {
+            "threshold": 0.62,
+            "refusal_accuracy": 0.625,
+            "false_refusal_rate": 0.024
+          },
+          {
+            "threshold": 0.65,
+            "refusal_accuracy": 0.875,
+            "false_refusal_rate": 0.024
+          },
+          {
+            "threshold": 0.7,
+            "refusal_accuracy": 1.0,
+            "false_refusal_rate": 0.119
+          },
+          {
+            "threshold": 0.75,
+            "refusal_accuracy": 1.0,
+            "false_refusal_rate": 0.238
+          }
+        ],
+        "misses@5": [
+          "hard-04",
+          "hard-09",
+          "hard-10"
+        ]
+      },
+      {
+        "config": "hybrid + rerank",
+        "hit@1": 0.857,
+        "hit@5": 1.0,
+        "recall@5": 1.0,
+        "mrr@5": 0.919,
+        "hit@5_paraphrased": 1.0,
+        "latency_p50_ms": 2392,
+        "latency_p95_ms": 2959,
+        "gate_default": {
+          "threshold": 0.02,
+          "refusal_accuracy": 0.875,
+          "false_refusal_rate": 0.024
+        },
+        "gate_sweep": [
+          {
+            "threshold": 0.005,
+            "refusal_accuracy": 0.875,
+            "false_refusal_rate": 0.024
+          },
+          {
+            "threshold": 0.01,
+            "refusal_accuracy": 0.875,
+            "false_refusal_rate": 0.024
+          },
+          {
+            "threshold": 0.02,
+            "refusal_accuracy": 0.875,
+            "false_refusal_rate": 0.024
+          },
+          {
+            "threshold": 0.05,
+            "refusal_accuracy": 0.875,
+            "false_refusal_rate": 0.024
+          },
+          {
+            "threshold": 0.1,
+            "refusal_accuracy": 1.0,
+            "false_refusal_rate": 0.071
+          },
+          {
+            "threshold": 0.2,
+            "refusal_accuracy": 1.0,
+            "false_refusal_rate": 0.071
+          },
+          {
+            "threshold": 0.3,
+            "refusal_accuracy": 1.0,
+            "false_refusal_rate": 0.071
+          },
+          {
+            "threshold": 0.5,
+            "refusal_accuracy": 1.0,
+            "false_refusal_rate": 0.119
+          }
+        ],
+        "misses@5": []
+      }
+    ]
+  },
+  "answers": {
+    "summary": {
+      "answer_correctness": 0.936,
+      "faithfulness": 0.966,
+      "refusal_accuracy_unanswerable": 1.0,
+      "false_refusal_rate_answerable": 0.024,
+      "citation_validity": 0.976,
+      "answers_with_citation": 0.902,
+      "latency_p50_ms": 3276,
+      "latency_p95_ms": 4229,
+      "n_questions": 50,
+      "n_judged": 41,
+      "answer_model": "openai/gpt-oss-20b",
+      "judge_model": "openai/gpt-oss-120b"
+    },
+    "details": [
+      {
+        "id": "sd-01",
+        "category": "system-design",
+        "answerable": true,
+        "answered": true,
+        "answer": "The CAP theorem states that in a distributed computer system you can only guarantee two of the following three properties at the same time:\n\n- **Consistency** – every read receives the most recent write or an error  \n- **Availability** – every request receives a response, without guarantee that it contains the most recent version of the information  \n- **Partition Tolerance** – the system continues to operate despite arbitrary partitioning due to network failures  \n\nBecause networks are unreliable, partition tolerance must be supported, so a trade‑off must be made between consistency and availability.  \n[1]",
+        "cited": [
+          1
+        ],
+        "invalid_citations": [],
+        "n_sources": 5,
+        "total_ms": 5846,
+        "provider": "groq",
+        "model": "openai/gpt-oss-20b",
+        "judge": {
+          "correctness": 1.0,
+          "faithfulness": 1.0,
+          "reason": "The answer accurately restates the CAP theorem and trade‑off as described in the provided sources without adding unsupported information."
+        }
+      },
+      {
+        "id": "sd-02",
+        "category": "system-design",
+        "answerable": true,
+        "answered": true,
+        "answer": "**Weak consistency**  \n- After a write, reads may or may not see the new value.  \n- The system takes a best‑effort approach to propagate updates.  \n- Typical in systems that need low latency, such as memcached, VoIP, video chat, and realtime multiplayer games.  \n- Example: a phone call may lose a few seconds of audio when the connection is lost and regained. [2]\n\n**Eventual consistency**  \n- After a write, reads will eventually see the new value, usually within milliseconds.  \n- Updates are replicated asynchronously.  \n- Used in highly available systems like DNS and email, and in many NoSQL databases.  \n- The system will become consistent over time if no new input arrives. [3][4]\n\n**Strong consistency**  \n- After a write, all subsequent reads see the updated value immediately.  \n- Data is replicated synchronously across replicas.  \n- Common in file systems and relational databases that require transactional guarantees. [1]",
+        "cited": [
+          2,
+          3,
+          4,
+          1
+        ],
+        "invalid_citations": [],
+        "n_sources": 4,
+        "total_ms": 3127,
+        "provider": "groq",
+        "model": "openai/gpt-oss-20b",
+        "judge": {
+          "correctness": 1.0,
+          "faithfulness": 1.0,
+          "reason": "The answer accurately reflects the key points from the sources and includes no unsupported statements."
+        }
+      },
+      {
+        "id": "sd-03",
+        "category": "system-design",
+        "answerable": true,
+        "answered": true,
+        "answer": "A weak‑consistency model would be appropriate for a video call where losing a few seconds of audio is acceptable. This model allows reads to potentially miss recent writes, which is fine for real‑time audio where brief gaps are tolerable. [1]",
+        "cited": [
+          1
+        ],
+        "invalid_citations": [],
+        "n_sources": 1,
+        "total_ms": 4089,
+        "provider": "groq",
+        "model": "openai/gpt-oss-20b",
+        "judge": {
+          "correctness": 1.0,
+          "faithfulness": 1.0,
+          "reason": "The answer correctly identifies weak consistency as the model and all statements are supported by the provided source."
+        }
+      },
+      {
+        "id": "sd-04",
+        "category": "system-design",
+        "answerable": true,
+        "answered": true,
+        "answer": "Active‑passive fail‑over works by having one server (the **active**) handle all traffic while a second server (the **passive**) sits on standby. Heartbeats are sent between the two; if the heartbeat is interrupted, the passive server takes over the active’s IP address and resumes service. The downtime depends on whether the passive server is already running in a hot standby state or needs to start up from a cold standby. Only the active server handles traffic while the passive is idle. This pattern is also called master‑slave fail‑over. [1]",
+        "cited": [
+          1
+        ],
+        "invalid_citations": [],
+        "n_sources": 4,
+        "total_ms": 3447,
+        "provider": "groq",
+        "model": "openai/gpt-oss-20b",
+        "judge": {
+          "correctness": 1.0,
+          "faithfulness": 1.0,
+          "reason": "The answer accurately restates the key points from the source without adding unsupported information."
+        }
+      },
+      {
+        "id": "sd-05",
+        "category": "system-design",
+        "answerable": true,
+        "answered": true,
+        "answer": "Active‑active fail‑over is a high‑availability pattern where **both servers actively manage traffic and share the load**. In this setup, each server handles requests simultaneously, and the system can continue to operate even if one server fails because the other is already processing traffic. If the servers are public‑facing, the DNS must be aware of the public IPs of both servers; if they are internal‑facing, the application logic must know about both servers [1].",
+        "cited": [
+          1
+        ],
+        "invalid_citations": [],
+        "n_sources": 4,
+        "total_ms": 3022,
+        "provider": "groq",
+        "model": "openai/gpt-oss-20b",
+        "judge": {
+          "correctness": 1.0,
+          "faithfulness": 1.0,
+          "reason": "The answer accurately restates the key points about active‑active failover and all claims are directly supported by the provided source."
+        }
+      },
+      {
+        "id": "sd-06",
+        "category": "system-design",
+        "answerable": true,
+        "answered": true,
+        "answer": "The 99.9% availability target allows **8 hours 45 minutes 57 seconds** of downtime per year. [2]",
+        "cited": [
+          2
+        ],
+        "invalid_citations": [],
+        "n_sources": 5,
+        "total_ms": 3631,
+        "provider": "groq",
+        "model": "openai/gpt-oss-20b",
+        "judge": {
+          "correctness": 1.0,
+          "faithfulness": 1.0,
+          "reason": "The answer correctly states the downtime per year for 99.9% availability and is fully supported by source [2]."
+        }
+      },
+      {
+        "id": "sd-07",
+        "category": "system-design",
+        "answerable": true,
+        "answered": true,
+        "answer": "When two services are **chained one after another** (i.e., in sequence), the overall availability is the product of their individual availabilities.  \nFor each service at 99.9% availability:\n\n```\nAvailability (Total) = 99.9% × 99.9% = 99.8%\n```\n\nSo the combined system would have **99.8% availability** [2].",
+        "cited": [
+          2
+        ],
+        "invalid_citations": [],
+        "n_sources": 5,
+        "total_ms": 3548,
+        "provider": "groq",
+        "model": "openai/gpt-oss-20b",
+        "judge": {
+          "correctness": 1.0,
+          "faithfulness": 1.0,
+          "reason": "The answer correctly states the sequential availability calculation and matches the provided source."
+        }
+      },
+      {
+        "id": "sd-08",
+        "category": "system-design",
+        "answerable": true,
+        "answered": true,
+        "answer": "**Layer 4 vs. Layer 7 load balancing**\n\n| Feature | Layer 4 (Transport) | Layer 7 (Application) |\n|---------|---------------------|-----------------------|\n| **What it inspects** | Source/destination IP addresses and ports in the transport header; no packet payload. | Full application‑layer data such as HTTP headers, URLs, cookies, or message body. |\n| **Decision basis** | Simple rules based on IP/port (e.g., round‑robin, least‑connections). | Complex rules that can route based on URL paths, cookie values, or content types. |\n| **Operation** | Forwards packets and performs NAT; minimal processing overhead. | Terminates connections, reads the request, then opens a new connection to the chosen server. |\n| **Use cases** | When you need fast, low‑overhead distribution across many identical servers. | When traffic needs to be directed to different servers based on application logic (e.g., video vs. billing traffic). |\n| **Examples** | HAProxy in layer‑4 mode, simple TCP load balancers. | NGINX or HAProxy in layer‑7 mode, routing HTTP requests to specific back‑ends. |\n\nLayer 4 load balancers are faster and use fewer resources because they only look at transport‑layer headers, while layer 7 load balancers provide richer routing capabilities by examining application‑layer content, at the cost of additional processing time.",
+        "cited": [],
+        "invalid_citations": [],
+        "n_sources": 3,
+        "total_ms": 2967,
+        "provider": "groq",
+        "model": "openai/gpt-oss-20b",
+        "judge": {
+          "correctness": 1.0,
+          "faithfulness": 1.0,
+          "reason": "The answer accurately restates the differences between layer 4 and layer 7 load balancing and all statements are supported by the provided sources."
+        }
+      },
+      {
+        "id": "sd-09",
+        "category": "system-design",
+        "answerable": true,
+        "answered": true,
+        "answer": "A reverse proxy is useful when you want to expose a single, unified interface to one or more backend services, even if there is only one web or application server. It can provide benefits such as:\n\n- **Security**: hides backend server details, allows IP blacklisting, and limits connections per client.  \n- **Scalability & flexibility**: clients see only the proxy’s IP, so you can scale or reconfigure back‑end servers without changing client URLs.  \n- **SSL termination**: decrypts HTTPS traffic once, so back‑end servers don’t need certificates or decryption overhead.  \n- **Compression, caching, and static‑content delivery**: the proxy can compress responses, cache frequent requests, and serve static assets directly.  \n\nThese advantages apply even when there is just a single back‑end server, making a reverse proxy valuable for simplifying deployment, improving performance, and adding security layers.  \n\nIn contrast, a load balancer is primarily used to distribute traffic across multiple identical servers to balance load, prevent overloading, and eliminate single points of failure.  \n\nThus, use a reverse proxy when you need unified interfaces, security, SSL termination, or content handling, and use a load balancer when you need to spread traffic across many servers for scalability and fault tolerance.  \n\n[1][2]",
+        "cited": [
+          1,
+          2
+        ],
+        "invalid_citations": [],
+        "n_sources": 5,
+        "total_ms": 3007,
+        "provider": "groq",
+        "model": "openai/gpt-oss-20b",
+        "judge": {
+          "correctness": 1.0,
+          "faithfulness": 1.0,
+          "reason": "The answer accurately reflects the reference and all statements are supported by the provided sources."
+        }
+      },
+      {
+        "id": "sd-10",
+        "category": "system-design",
+        "answerable": true,
+        "answered": true,
+        "answer": "**Master‑slave replication** works by having one node (the **master**) handle all writes and optionally reads, while one or more nodes (the **slaves**) receive copies of the master’s write operations and serve only read traffic. The master replicates each write to its slaves, which can then be queried for read requests. If the master fails, the system can continue in a read‑only mode until a slave is promoted to become the new master or a new master is provisioned. Additional logic is required to promote a slave to master, and the replication process adds hardware and complexity to the system.  \n\nSources: [1][3]",
+        "cited": [
+          1,
+          3
+        ],
+        "invalid_citations": [],
+        "n_sources": 5,
+        "total_ms": 3097,
+        "provider": "groq",
+        "model": "openai/gpt-oss-20b",
+        "judge": {
+          "correctness": 1.0,
+          "faithfulness": 1.0,
+          "reason": "The answer accurately reflects the reference and all statements are supported by the provided sources."
+        }
+      },
+      {
+        "id": "sd-11",
+        "category": "system-design",
+        "answerable": true,
+        "answered": true,
+        "answer": "Splitting databases by function—also called **federation**—means creating separate, smaller databases that each handle a distinct domain of your application.  \n- Instead of one large monolithic database, you would have, for example, a **forums** database, a **users** database, and a **products** database.  \n- Each database stores only the data relevant to its function, reducing the amount of read and write traffic it receives.  \n- Because the databases are smaller, more of their data can fit in memory, improving cache locality and increasing cache hits.  \n- With no single central master serializing writes, each database can accept writes in parallel, boosting overall write throughput.  \n\nIn short, federation partitions the data by business domain to lower contention, improve performance, and enable parallelism. [1]",
+        "cited": [
+          1
+        ],
+        "invalid_citations": [],
+        "n_sources": 1,
+        "total_ms": 3128,
+        "provider": "groq",
+        "model": "openai/gpt-oss-20b",
+        "judge": {
+          "correctness": 1.0,
+          "faithfulness": 1.0,
+          "reason": "The answer accurately restates the source description of federation and adds no unsupported information."
+        }
+      },
+      {
+        "id": "sd-12",
+        "category": "system-design",
+        "answerable": true,
+        "answered": true,
+        "answer": "**Disadvantages of sharding**\n\n- Requires updating application logic to work with shards, which can lead to complex SQL queries. [1]  \n- Data distribution can become lopsided; a set of power users on one shard can overload that shard compared to others. [1]  \n- Rebalancing shards adds additional complexity; even with consistent hashing, some data transfer is still needed. [1]  \n- Joining data from multiple shards is more complex. [1]  \n- Sharding adds more hardware and overall system complexity. [1]",
+        "cited": [
+          1
+        ],
+        "invalid_citations": [],
+        "n_sources": 2,
+        "total_ms": 3005,
+        "provider": "groq",
+        "model": "openai/gpt-oss-20b",
+        "judge": {
+          "correctness": 1.0,
+          "faithfulness": 1.0,
+          "reason": "The answer lists exactly the disadvantages of sharding as stated in the provided source without adding unsupported information."
+        }
+      },
+      {
+        "id": "sd-13",
+        "category": "system-design",
+        "answerable": true,
+        "answered": true,
+        "answer": "**Denormalization**  \n- The process of adding redundant copies of data to multiple tables so that expensive joins can be avoided during reads.  \n- Some RDBMS (e.g., PostgreSQL, Oracle) provide materialized views to store and keep these redundant copies consistent. [1]\n\n**Trade‑off**  \n- **Benefit:** Improves read performance, especially when reads far outnumber writes (e.g., 100:1 or 1000:1). A complex join is replaced by a simple lookup, saving disk I/O. [1]  \n- **Cost:**  \n  - Data duplication increases storage usage.  \n  - Maintaining consistency between redundant copies adds design complexity.  \n  - Under heavy write load, the extra work of updating duplicates can make a denormalized database slower than a normalized one. [2]",
+        "cited": [
+          1,
+          2
+        ],
+        "invalid_citations": [],
+        "n_sources": 2,
+        "total_ms": 3611,
+        "provider": "groq",
+        "model": "openai/gpt-oss-20b",
+        "judge": {
+          "correctness": 1.0,
+          "faithfulness": 1.0,
+          "reason": "The answer accurately captures the definition and trade‑offs of denormalization and all statements are supported by the provided sources."
+        }
+      },
+      {
+        "id": "sd-14",
+        "category": "system-design",
+        "answerable": true,
+        "answered": true,
+        "answer": "The four main types of NoSQL databases are:\n\n- **Key‑value stores** – store data as a simple key and its associated value.  \n- **Document stores** – store structured documents (JSON, XML, etc.) as values.  \n- **Wide‑column stores** – store data in tables with flexible columns, often in column families.  \n- **Graph databases** – store data as nodes and edges to model complex relationships.  \n\nThese categories are listed in the System Design Primer’s NoSQL section.",
+        "cited": [],
+        "invalid_citations": [],
+        "n_sources": 5,
+        "total_ms": 3337,
+        "provider": "groq",
+        "model": "openai/gpt-oss-20b",
+        "judge": {
+          "correctness": 1.0,
+          "faithfulness": 1.0,
+          "reason": "The answer lists the four main NoSQL types exactly as described in the sources and provides only supported details."
+        }
+      },
+      {
+        "id": "sd-15",
+        "category": "system-design",
+        "answerable": true,
+        "answered": true,
+        "answer": "For a social network with many relationships, a **graph database** is the most suitable NoSQL store. Graph databases are specifically optimized to represent complex, many‑to‑many relationships between entities, which is exactly what a social network requires.  \n\n- Each node can represent a user or an entity, and each arc (edge) represents a relationship such as “follows,” “friends,” or “likes.”  \n- They provide high performance for traversing these relationships, enabling efficient queries like “find friends of friends” or “suggest connections.”  \n\nThus, a graph database is the best choice for modelling a social network with many relationships. [1]",
+        "cited": [
+          1
+        ],
+        "invalid_citations": [],
+        "n_sources": 3,
+        "total_ms": 3215,
+        "provider": "groq",
+        "model": "openai/gpt-oss-20b",
+        "judge": {
+          "correctness": 1.0,
+          "faithfulness": 1.0,
+          "reason": "The answer correctly states that a graph database is best for modeling a social network with many relationships and all claims are supported by source [1]."
+        }
+      },
+      {
+        "id": "sd-16",
+        "category": "system-design",
+        "answerable": true,
+        "answered": true,
+        "answer": "**Reasons to choose SQL over NoSQL**\n\n- Structured data is required.  \n- A strict schema is needed.  \n- The data model is relational.  \n- Complex joins are necessary.  \n- Transactions are required.  \n- Clear patterns for scaling exist.  \n- The ecosystem is more established (developers, community, code, tools, etc).  \n- Lookups by index are very fast.  \n\n[1]",
+        "cited": [
+          1
+        ],
+        "invalid_citations": [],
+        "n_sources": 3,
+        "total_ms": 2731,
+        "provider": "groq",
+        "model": "openai/gpt-oss-20b",
+        "judge": {
+          "correctness": 1.0,
+          "faithfulness": 1.0,
+          "reason": "The answer lists all reasons for choosing SQL exactly as given in source [1] with no unsupported claims."
+        }
+      },
+      {
+        "id": "sd-17",
+        "category": "system-design",
+        "answerable": true,
+        "answered": true,
+        "answer": "**Cache‑aside (lazy loading) workflow**\n\n1. **Read request** – The application first checks the cache for the requested key.  \n   *If the key is present, the value is returned immediately.*  \n\n2. **Cache miss** – If the key is not found, the application loads the data from the database.  \n   *This is the “miss” path that incurs the three‑trip delay mentioned in source [1].*  \n\n3. **Populate cache** – After retrieving the data, the application writes the value into the cache for future requests.  \n   *The code example in source [3] shows this step with `cache.set(key, json.dumps(user))`.*  \n\n4. **Return data** – The application returns the data to the caller.  \n\n5. **Subsequent reads** – Future reads for the same key hit the cache, providing fast access and reducing load on the database.  \n   *Only requested data is cached, preventing the cache from filling with unused items (source [3]).*  \n\nThis pattern is also called **lazy loading** because data is loaded into the cache only when it is first requested.",
+        "cited": [
+          1,
+          3
+        ],
+        "invalid_citations": [],
+        "n_sources": 5,
+        "total_ms": 3100,
+        "provider": "groq",
+        "model": "openai/gpt-oss-20b",
+        "judge": {
+          "correctness": 1.0,
+          "faithfulness": 1.0,
+          "reason": "The answer accurately restates the cache‑aside steps and all claims are backed by the provided sources."
+        }
+      },
+      {
+        "id": "sd-18",
+        "category": "system-design",
+        "answerable": true,
+        "answered": true,
+        "answer": "**Write‑through**\n\n* The application writes to the cache **and** the cache writes the same data to the database **synchronously**.  \n  * The write operation is slow because it waits for the database write to finish.  \n  * Subsequent reads are fast because the data is already in the cache.  \n  * The cache never holds stale data.  \n  * New nodes that join the cluster will not have cached entries until they are written to the database.  \n  * Most data written might never be read, which can be mitigated with a TTL.  \n  * The pattern is simple to implement but can hurt write performance.  \n  * Source: [4][3]  \n\n**Write‑behind (write‑back)**\n\n* The application writes to the cache and the cache **asynchronously** writes the data to the database.  \n  * This improves write performance because the application does not wait for the database write.  \n  * If the cache crashes before the data reaches the database, the data can be lost.  \n  * Implementing write‑behind is more complex than cache‑aside or write‑through.  \n  * Source: [2][1]  \n\n**Key difference**\n\n* **Synchronous vs. asynchronous**: write‑through writes to the database immediately; write‑behind defers the database write until later.  \n* **Data safety**: write‑through guarantees no data loss; write‑behind risks loss if the cache fails before persistence.  \n* **Performance**: write‑through can be slower for writes; write‑behind offers faster writes at the cost of complexity and potential data loss.",
+        "cited": [
+          4,
+          3,
+          2,
+          1
+        ],
+        "invalid_citations": [],
+        "n_sources": 4,
+        "total_ms": 3249,
+        "provider": "groq",
+        "model": "openai/gpt-oss-20b",
+        "judge": {
+          "correctness": 1.0,
+          "faithfulness": 1.0,
+          "reason": "The answer accurately reflects the key differences and includes only information supported by the provided sources."
+        }
+      },
+      {
+        "id": "sd-19",
+        "category": "system-design",
+        "answerable": true,
+        "answered": true,
+        "answer": "**Refresh‑ahead caching** is a cache update strategy where the cache is configured to automatically refresh any recently accessed entry before it expires. The idea is to pre‑emptively load the next likely needed data into the cache, reducing read latency compared to a simple read‑through approach. However, if the cache cannot accurately predict which items will be needed next, refresh‑ahead can actually hurt performance.  \n\n- Automatically refreshes recently accessed entries before expiration. [1]  \n- Can lower latency if predictions are accurate. [1]  \n- Poor prediction can degrade performance. [2]",
+        "cited": [
+          1,
+          2
+        ],
+        "invalid_citations": [],
+        "n_sources": 2,
+        "total_ms": 3069,
+        "provider": "groq",
+        "model": "openai/gpt-oss-20b",
+        "judge": {
+          "correctness": 1.0,
+          "faithfulness": 1.0,
+          "reason": "The answer accurately restates the definition, benefits, and drawback of refresh-ahead caching, all directly supported by the provided sources."
+        }
+      },
+      {
+        "id": "sd-20",
+        "category": "system-design",
+        "answerable": true,
+        "answered": true,
+        "answer": "Message queues help with slow operations by decoupling the request from the processing:\n\n- The application publishes a job to the queue and immediately returns a response to the user, so the user is not blocked while the operation runs in the background.  \n- A worker later picks up the job, processes it, and signals completion, allowing the heavy work to be done asynchronously.  \n- This workflow lets the client optionally show a quick UI update (e.g., posting a tweet instantly) while the full operation finishes later.  \n\nThese benefits come from the queue’s ability to hold and deliver messages, keeping the user experience responsive while the slow task is handled separately.  \n\n[1]",
+        "cited": [
+          1
+        ],
+        "invalid_citations": [],
+        "n_sources": 4,
+        "total_ms": 3314,
+        "provider": "groq",
+        "model": "openai/gpt-oss-20b",
+        "judge": {
+          "correctness": 1.0,
+          "faithfulness": 1.0,
+          "reason": "The answer accurately restates the key points about publishing a job, non‑blocking user, background processing, and optional UI update, all directly supported by the provided source."
+        }
+      },
+      {
+        "id": "sd-21",
+        "category": "system-design",
+        "answerable": true,
+        "answered": true,
+        "answer": "When a job queue grows larger than available memory, the system should apply **back‑pressure** to prevent further growth. This involves:\n\n- **Limiting the queue size** so that it stays within memory bounds, maintaining high throughput and good response times for jobs already queued.  \n- **Returning a busy or HTTP 503 status code** to clients when the queue is full, prompting them to retry later (often with exponential back‑off).  \n\nThis approach keeps the system responsive and avoids memory exhaustion. [1]",
+        "cited": [
+          1
+        ],
+        "invalid_citations": [],
+        "n_sources": 3,
+        "total_ms": 3460,
+        "provider": "groq",
+        "model": "openai/gpt-oss-20b",
+        "judge": {
+          "correctness": 1.0,
+          "faithfulness": 1.0,
+          "reason": "The answer accurately restates the reference and all claims are directly supported by source [1]."
+        }
+      },
+      {
+        "id": "sd-22",
+        "category": "system-design",
+        "answerable": true,
+        "answered": true,
+        "answer": "**UDP vs. TCP**\n\n| Feature | UDP | TCP |\n|---------|-----|-----|\n| **Connection model** | Connectionless; no handshake | Connection‑oriented; handshake establishes and terminates connection |\n| **Reliability** | No guarantees; packets may arrive out of order or be lost | Guarantees all packets arrive intact, in order, and without corruption |\n| **Ordering** | No ordering guarantees | Sequence numbers ensure original order |\n| **Error handling** | No built‑in error correction; relies on application logic | Checksums, acknowledgements, and automatic retransmission |\n| **Congestion control** | None | Implements flow and congestion control |\n| **Latency** | Lower latency; suitable for real‑time use (VoIP, gaming) | Higher latency due to reliability mechanisms |\n| **Use cases** | Real‑time, low‑latency applications where late data is worse than loss | Applications requiring full data integrity (web, database, FTP, SSH) |\n| **Efficiency** | Generally more efficient; less overhead | More overhead; can be expensive with many open connections |\n| **Typical use** | Broadcasts (e.g., DHCP), real‑time multiplayer games | Web servers, databases, email, file transfer, SSH |",
+        "cited": [],
+        "invalid_citations": [],
+        "n_sources": 3,
+        "total_ms": 3503,
+        "provider": "groq",
+        "model": "openai/gpt-oss-20b",
+        "judge": {
+          "correctness": 1.0,
+          "faithfulness": 1.0,
+          "reason": "The answer accurately reflects the key differences between UDP and TCP and all statements are supported by the provided sources."
+        }
+      },
+      {
+        "id": "sd-23",
+        "category": "system-design",
+        "answerable": true,
+        "answered": true,
+        "answer": "**Latency** is the time it takes to perform a single action or produce a single result.  \n**Throughput** is the number of such actions or results that can be performed per unit of time.  \nIn system design you typically aim for the highest possible throughput while keeping latency within acceptable limits.  \n\nSources: [1] [2]",
+        "cited": [
+          1,
+          2
+        ],
+        "invalid_citations": [],
+        "n_sources": 2,
+        "total_ms": 3101,
+        "provider": "groq",
+        "model": "openai/gpt-oss-20b",
+        "judge": {
+          "correctness": 1.0,
+          "faithfulness": 1.0,
+          "reason": "The answer accurately restates the definitions and trade‑off from the sources without adding unsupported information."
+        }
+      },
+      {
+        "id": "sd-24",
+        "category": "system-design",
+        "answerable": true,
+        "answered": true,
+        "answer": "**Push CDN**  \n- You upload new or changed content to the CDN yourself and rewrite URLs to point to it.  \n- Content is only transferred when it is new or updated, so traffic to the CDN is minimized but storage usage is higher.  \n- Best for sites with low traffic or infrequently updated content, because the CDN holds the content permanently until you replace it. [2]\n\n**Pull CDN**  \n- The CDN fetches content from your origin server the first time a user requests it.  \n- The CDN caches the content for a time‑to‑live (TTL) period; after the TTL expires it may re‑pull if requested again.  \n- This reduces storage on the CDN but can create redundant traffic if files expire before they actually change. It works well for high‑traffic sites where only recently requested content stays cached. [1]",
+        "cited": [
+          2,
+          1
+        ],
+        "invalid_citations": [],
+        "n_sources": 4,
+        "total_ms": 3426,
+        "provider": "groq",
+        "model": "openai/gpt-oss-20b",
+        "judge": {
+          "correctness": 1.0,
+          "faithfulness": 1.0,
+          "reason": "The answer accurately reflects the key differences between push and pull CDNs and all claims are supported by the provided sources."
+        }
+      },
+      {
+        "id": "sd-25",
+        "category": "system-design",
+        "answerable": true,
+        "answered": true,
+        "answer": "- **Consul** – tracks registered service names, addresses, and ports, and can perform health checks via HTTP endpoints.  \n- **Etcd** – provides a key‑value store that can store service registration data (names, addresses, ports) and also supports health checks.  \n- **Zookeeper** – similarly keeps track of service registrations and can be used for service discovery.  \n\nThese tools enable microservices to locate each other’s addresses and ports. [1]",
+        "cited": [
+          1
+        ],
+        "invalid_citations": [],
+        "n_sources": 2,
+        "total_ms": 3391,
+        "provider": "groq",
+        "model": "openai/gpt-oss-20b",
+        "judge": {
+          "correctness": 1.0,
+          "faithfulness": 1.0,
+          "reason": "The answer lists Consul, Etcd, and Zookeeper as tools that track names, addresses, and ports, matching the source."
+        }
+      },
+      {
+        "id": "sd-26",
+        "category": "system-design",
+        "answerable": true,
+        "answered": true,
+        "answer": "**Steps to approach a system design interview question**\n\n1. **Outline use cases, constraints, and assumptions**  \n   * Gather requirements and scope the problem.  \n   * Ask clarifying questions about users, usage patterns, scale, data volume, request rate, and read/write ratio.  \n   * Document assumptions.  \n   * Source: [2]  \n\n2. **Create a high‑level design**  \n   * Sketch the main components and their connections.  \n   * Justify each component’s inclusion and placement.  \n   * Source: [1]  \n\n3. **Design core components in detail**  \n   * Dive into specifics for each core part (e.g., hashing, storage, lookup, API design).  \n   * Consider trade‑offs such as hash collisions, SQL vs. NoSQL, schema design, and lookup strategies.  \n   * Source: [3]  \n\n4. **Lead the open‑ended conversation**  \n   * Treat the interview as a dialogue; guide the discussion through the above steps.  \n   * Source: [4]  \n\nThese steps provide a structured framework for tackling any system design interview.",
+        "cited": [
+          2,
+          1,
+          3,
+          4
+        ],
+        "invalid_citations": [],
+        "n_sources": 5,
+        "total_ms": 3304,
+        "provider": "groq",
+        "model": "openai/gpt-oss-20b",
+        "judge": {
+          "correctness": 0.4,
+          "faithfulness": 0.6,
+          "reason": "The answer includes most listed steps but omits the scaling step and adds an extra conversation step not in the reference answer, reducing correctness and partially deviating from source-supported content."
+        }
+      },
+      {
+        "id": "dsa-01",
+        "category": "dsa",
+        "answerable": true,
+        "answered": true,
+        "answer": "**Complete knapsack problem**\n\n- In the complete knapsack, each item can be selected **an unlimited number of times** instead of only once.  \n- The state is defined the same way as in 0‑1 knapsack:  \n  \\(f_{i,j}\\) is the maximum value achievable using the first \\(i\\) items with capacity \\(j\\).  \n- The transition rule differs: for each item you consider all possible counts \\(k\\) (from 0 up to the capacity limit) and update the state as  \n  \\[\n  f_{i,j} = \\max_{k=0}^{\\lfloor j/w_i \\rfloor}\\bigl(f_{i-1,j-k\\cdot w_i} + k\\cdot v_i\\bigr)\n  \\]  \n  (the exact form may vary, but the key is that \\(k\\) can be any non‑negative integer) [1].\n\n**Difference from 0‑1 knapsack**\n\n- **0‑1 knapsack**: each item can be taken **at most once**; the transition only considers \\(k=0\\) or \\(k=1\\).  \n- **Complete knapsack**: each item can be taken **any number of times**; the transition considers all feasible \\(k\\ge0\\).  \n- Consequently, the complete knapsack has a different (often more complex) transition rule and typically a higher time complexity, e.g., \\(O(nW)\\) for the classic DP implementation versus \\(O(nW)\\) for 0‑1 but with a different inner loop [1].",
+        "cited": [
+          1
+        ],
+        "invalid_citations": [],
+        "n_sources": 5,
+        "total_ms": 3756,
+        "provider": "groq",
+        "model": "openai/gpt-oss-20b",
+        "judge": {
+          "correctness": 0.95,
+          "faithfulness": 0.6,
+          "reason": "The answer correctly describes unlimited selection and state definition, but adds an explicit transition formula not present in the provided sources."
+        }
+      },
+      {
+        "id": "dsa-02",
+        "category": "dsa",
+        "answerable": true,
+        "answered": true,
+        "answer": "The multiple‑knapsack problem can be made faster by **binary grouping** (splitting each item’s count into powers of two).  \n- Each original item \\(i\\) that can be taken up to \\(k_i\\) times is replaced by a set of “bundles” \\(A_{i,j}\\).  \n- For \\(j = 0,\\dots,\\lfloor\\log_2(k_i+1)\\rfloor-1\\) create a bundle that contains \\(2^j\\) copies of item \\(i\\).  \n- If \\(k_i+1\\) is not an exact power of two, add one more bundle containing the remaining \\(k_i-(2^{\\lfloor\\log_2(k_i+1)\\rfloor}-1)\\) copies.  \n- Any feasible selection of at most \\(k_i\\) copies of item \\(i\\) can be represented by choosing a subset of these bundles, so the problem reduces to a 0‑1 knapsack with \\(\\sum_i O(\\log k_i)\\) items.  \n- This reduces the time complexity from \\(O(W\\sum_i k_i)\\) to \\(O\\!\\bigl(W\\sum_i \\log k_i\\bigr)\\) [1][2].",
+        "cited": [
+          1,
+          2
+        ],
+        "invalid_citations": [],
+        "n_sources": 5,
+        "total_ms": 3768,
+        "provider": "groq",
+        "model": "openai/gpt-oss-20b",
+        "judge": {
+          "correctness": 1.0,
+          "faithfulness": 1.0,
+          "reason": "The response accurately restates the binary grouping method and its complexity reduction, all directly supported by the provided sources."
+        }
+      },
+      {
+        "id": "dsa-03",
+        "category": "dsa",
+        "answerable": true,
+        "answered": true,
+        "answer": "**How 0‑1 BFS finds shortest paths**\n\n- 0‑1 BFS treats the graph as a weighted graph where every edge weight is either 0 or 1.  \n- Because the difference between the distances of any two vertices in the queue is at most 1, the queue can be kept sorted without a full priority queue.  \n- When a vertex `v` is processed, each outgoing edge `(v,u)` with weight `w` is examined.  \n  - If `d[v] + w < d[u]`, the distance to `u` is updated.  \n  - If `w == 0`, `u` is inserted at the **front** of the deque (`push_front`), keeping it at the same distance as `v`.  \n  - If `w == 1`, `u` is inserted at the **back** of the deque (`push_back`), placing it one unit farther than `v`.  \n- This insertion strategy guarantees that vertices are always removed from the deque in non‑decreasing order of their shortest‑path distance, exactly as Dijkstra’s algorithm would do with a priority queue.  \n- Consequently, each vertex is finalized when first removed, and the algorithm runs in `O(|E|)` time for graphs with edge weights 0 or 1.  \n\nSources: [1], [3]",
+        "cited": [
+          1,
+          3
+        ],
+        "invalid_citations": [],
+        "n_sources": 5,
+        "total_ms": 4415,
+        "provider": "groq",
+        "model": "openai/gpt-oss-20b",
+        "judge": {
+          "correctness": 1.0,
+          "faithfulness": 1.0,
+          "reason": "The answer accurately describes the deque-based 0‑1 BFS method and all claims are directly supported by the provided sources."
+        }
+      },
+      {
+        "id": "dsa-04",
+        "category": "dsa",
+        "answerable": true,
+        "answered": true,
+        "answer": "Kruskal’s algorithm builds a minimum spanning tree by **greedily adding the lightest edges that do not create a cycle**.  \n1. **Start with a forest** of single‑vertex trees (each vertex is its own component) [1].  \n2. **Sort all edges** of the weighted undirected graph in non‑decreasing order of weight [1].  \n3. **Iterate through the sorted edges**:  \n   * For each edge, check whether its two endpoints belong to different components.  \n   * If they do, **add the edge to the growing tree** and merge the two components into one.  \n   * If they are already in the same component, skip the edge to avoid a cycle [1].  \n4. Continue until all vertices belong to a single component; the set of added edges forms a spanning tree.  \n5. Because at each step the lightest possible edge that keeps the forest acyclic is chosen, the resulting spanning tree has the minimum possible total weight. The correctness follows from the cut property and can be proven by induction on the set of chosen edges [3].",
+        "cited": [
+          1,
+          3
+        ],
+        "invalid_citations": [],
+        "n_sources": 5,
+        "total_ms": 3634,
+        "provider": "groq",
+        "model": "openai/gpt-oss-20b",
+        "judge": {
+          "correctness": 0.95,
+          "faithfulness": 0.95,
+          "reason": "The answer accurately describes Kruskal's process matching the reference and all claims are backed by the provided sources."
+        }
+      },
+      {
+        "id": "dsa-05",
+        "category": "dsa",
+        "answerable": true,
+        "answered": true,
+        "answer": "The Rabin‑Karp algorithm finds a pattern in a text by using hashing.  \nFirst it computes the hash of the pattern \\(s\\). Then it pre‑computes hash values for all prefixes of the text \\(t\\). With these prefix hashes, the hash of any substring of length \\(|s|\\) can be obtained in constant time. The algorithm compares each such substring hash with the pattern hash; if they match, the substring is a candidate occurrence. This process scans the text in \\(O(|t|)\\) time, and the initial hash computation takes \\(O(|s|)\\), giving a total complexity of \\(O(|t|+|s|)\\) [1].",
+        "cited": [
+          1
+        ],
+        "invalid_citations": [],
+        "n_sources": 4,
+        "total_ms": 3756,
+        "provider": "groq",
+        "model": "openai/gpt-oss-20b",
+        "judge": {
+          "correctness": 1.0,
+          "faithfulness": 1.0,
+          "reason": "The answer accurately restates the reference explanation using only information present in the provided sources."
+        }
+      },
+      {
+        "id": "dsa-06",
+        "category": "dsa",
+        "answerable": true,
+        "answered": true,
+        "answer": "The prefix function of a string \\(s\\) of length \\(n\\) is an array \\(\\pi\\) of length \\(n\\) where each entry \\(\\pi[i]\\) gives the length of the longest proper prefix of the substring \\(s[0 \\dots i]\\) that is also a suffix of that substring. A proper prefix is a prefix that is not equal to the entire substring itself, and by definition \\(\\pi[0] = 0\\) [1].",
+        "cited": [
+          1
+        ],
+        "invalid_citations": [
+          0
+        ],
+        "n_sources": 5,
+        "total_ms": 3724,
+        "provider": "groq",
+        "model": "openai/gpt-oss-20b",
+        "judge": {
+          "correctness": 1.0,
+          "faithfulness": 1.0,
+          "reason": "The answer accurately restates the definition of the prefix function as given in the source without adding unsupported information."
+        }
+      },
+      {
+        "id": "un-01",
+        "category": "unanswerable",
+        "answerable": false,
+        "answered": false,
+        "answer": "I don't know based on your documents.",
+        "cited": [],
+        "invalid_citations": [],
+        "n_sources": 0,
+        "total_ms": 2535,
+        "provider": null,
+        "model": null
+      },
+      {
+        "id": "un-02",
+        "category": "unanswerable",
+        "answerable": false,
+        "answered": false,
+        "answer": "I don't know based on your documents.",
+        "cited": [],
+        "invalid_citations": [],
+        "n_sources": 0,
+        "total_ms": 2932,
+        "provider": null,
+        "model": null
+      },
+      {
+        "id": "un-03",
+        "category": "unanswerable",
+        "answerable": false,
+        "answered": false,
+        "answer": "I don't know based on your documents.",
+        "cited": [],
+        "invalid_citations": [],
+        "n_sources": 0,
+        "total_ms": 2424,
+        "provider": null,
+        "model": null
+      },
+      {
+        "id": "un-04",
+        "category": "unanswerable",
+        "answerable": false,
+        "answered": false,
+        "answer": "I don't know based on your documents.",
+        "cited": [],
+        "invalid_citations": [],
+        "n_sources": 1,
+        "total_ms": 3044,
+        "provider": "groq",
+        "model": "openai/gpt-oss-20b"
+      },
+      {
+        "id": "un-05",
+        "category": "unanswerable",
+        "answerable": false,
+        "answered": false,
+        "answer": "I don't know based on your documents.",
+        "cited": [],
+        "invalid_citations": [],
+        "n_sources": 0,
+        "total_ms": 2087,
+        "provider": null,
+        "model": null
+      },
+      {
+        "id": "un-06",
+        "category": "unanswerable",
+        "answerable": false,
+        "answered": false,
+        "answer": "I don't know based on your documents.",
+        "cited": [],
+        "invalid_citations": [],
+        "n_sources": 0,
+        "total_ms": 2449,
+        "provider": null,
+        "model": null
+      },
+      {
+        "id": "un-07",
+        "category": "unanswerable",
+        "answerable": false,
+        "answered": false,
+        "answer": "I don't know based on your documents.",
+        "cited": [],
+        "invalid_citations": [],
+        "n_sources": 0,
+        "total_ms": 2646,
+        "provider": null,
+        "model": null
+      },
+      {
+        "id": "un-08",
+        "category": "unanswerable",
+        "answerable": false,
+        "answered": false,
+        "answer": "I don't know based on your documents.",
+        "cited": [],
+        "invalid_citations": [],
+        "n_sources": 0,
+        "total_ms": 2904,
+        "provider": null,
+        "model": null
+      },
+      {
+        "id": "hard-01",
+        "category": "system-design",
+        "answerable": true,
+        "answered": true,
+        "answer": "Adding more read replicas increases the amount of data that must be replicated from the master, which can cause the replicas to fall further behind the master’s current state.  \n- Each replica must receive and apply every write that the master performs.  \n- With more replicas, the master has to send the same write to more nodes, increasing the overall replication traffic.  \n- The additional traffic can overload the master’s outbound bandwidth or the network, causing delays in delivering updates to each replica.  \n- As a result, the replication lag—the time difference between the master’s latest write and the replica’s current state—tends to grow when the number of read replicas rises.  \n\nThis is one of the disadvantages of master‑master replication noted in the notes. [1]",
+        "cited": [
+          1
+        ],
+        "invalid_citations": [],
+        "n_sources": 2,
+        "total_ms": 3444,
+        "provider": "groq",
+        "model": "openai/gpt-oss-20b",
+        "judge": {
+          "correctness": 0.9,
+          "faithfulness": 0.7,
+          "reason": "The answer captures the main point that more read replicas increase replication lag, but adds unsupported details about master bandwidth overload."
+        }
+      },
+      {
+        "id": "hard-02",
+        "category": "system-design",
+        "answerable": true,
+        "answered": true,
+        "answer": "The risk is that data could be lost if the cache crashes or becomes unavailable before the write is flushed to the underlying data store. This is a known disadvantage of write‑behind (write‑back) caching [1].",
+        "cited": [
+          1
+        ],
+        "invalid_citations": [],
+        "n_sources": 2,
+        "total_ms": 3069,
+        "provider": "groq",
+        "model": "openai/gpt-oss-20b",
+        "judge": {
+          "correctness": 1.0,
+          "faithfulness": 1.0,
+          "reason": "The answer correctly states the risk of data loss before persistence, matching the source and adds no unsupported information."
+        }
+      },
+      {
+        "id": "hard-03",
+        "category": "system-design",
+        "answerable": true,
+        "answered": true,
+        "answer": "Web servers should be **stateless** when you add more of them because horizontal scaling introduces complexity and requires each server to be a clone of the others. If a server holds user‑related data (e.g., sessions or profile pictures), the load balancer would need to route a user’s requests to the same server each time, defeating the benefits of scaling out. Stateless servers avoid this by not storing session data locally, allowing any server to handle any request [1].\n\nWhen servers are stateless, **sessions are stored in a centralized data store** such as a database (SQL or NoSQL) or a persistent cache like Redis or Memcached. This central store holds all session information, enabling any web server to retrieve or update a user’s session as needed [1].",
+        "cited": [
+          1
+        ],
+        "invalid_citations": [],
+        "n_sources": 1,
+        "total_ms": 2765,
+        "provider": "groq",
+        "model": "openai/gpt-oss-20b",
+        "judge": {
+          "correctness": 1.0,
+          "faithfulness": 1.0,
+          "reason": "The answer accurately restates that servers must be stateless for horizontal scaling and that sessions should be stored in a centralized data store such as a database or cache, all directly supported by the source."
+        }
+      },
+      {
+        "id": "hard-04",
+        "category": "system-design",
+        "answerable": true,
+        "answered": true,
+        "answer": "Keeping cached data correct is hard because:\n\n- **Consistency must be maintained** between the cache and the source of truth (the database) through cache invalidation, which is inherently complex [3].\n- **Cache invalidation decisions** (when to update or delete entries) add extra logic and can be error‑prone, especially when data changes at the database level [3].\n- **Stale data** can appear if updates happen in the database but the cache isn’t refreshed; TTLs or write‑through strategies are needed to mitigate this, but they introduce their own trade‑offs [4][5].\n- **Node failures or scaling** can replace a cache node with an empty one, causing latency spikes and potential data loss until the new node repopulates the cache [4].\n- **Complex queries** make it difficult to delete or update specific cached results, as a single data change may affect many cached query results [1].\n\nThese factors together make ensuring that cached data remains accurate and up‑to‑date a challenging problem.",
+        "cited": [
+          3,
+          4,
+          5,
+          1
+        ],
+        "invalid_citations": [],
+        "n_sources": 5,
+        "total_ms": 3456,
+        "provider": "groq",
+        "model": "openai/gpt-oss-20b",
+        "judge": {
+          "correctness": 1.0,
+          "faithfulness": 1.0,
+          "reason": "The answer accurately reflects the reference and all claims are supported by the provided sources."
+        }
+      },
+      {
+        "id": "hard-05",
+        "category": "system-design",
+        "answerable": true,
+        "answered": true,
+        "answer": "- **When the task is inexpensive or time‑critical**  \n  If the operation can be completed quickly and the user expects an immediate response, adding it to a queue introduces unnecessary latency and complexity. In such cases a synchronous execution is preferable.  \n  *Source: [2]*",
+        "cited": [
+          2
+        ],
+        "invalid_citations": [],
+        "n_sources": 3,
+        "total_ms": 4229,
+        "provider": "groq",
+        "model": "openai/gpt-oss-20b",
+        "judge": {
+          "correctness": 1.0,
+          "faithfulness": 1.0,
+          "reason": "The answer accurately reflects the reference and all claims are supported by source [2]."
+        }
+      },
+      {
+        "id": "hard-06",
+        "category": "system-design",
+        "answerable": true,
+        "answered": false,
+        "answer": "I don't know based on your documents.",
+        "cited": [],
+        "invalid_citations": [],
+        "n_sources": 0,
+        "total_ms": 2241,
+        "provider": null,
+        "model": null
+      },
+      {
+        "id": "hard-07",
+        "category": "system-design",
+        "answerable": true,
+        "answered": true,
+        "answer": "A key‑value store offers constant‑time reads and writes and is often kept in memory or on SSD. [1]",
+        "cited": [
+          1
+        ],
+        "invalid_citations": [],
+        "n_sources": 1,
+        "total_ms": 3871,
+        "provider": "groq",
+        "model": "openai/gpt-oss-20b",
+        "judge": {
+          "correctness": 1.0,
+          "faithfulness": 1.0,
+          "reason": "The answer accurately reflects the reference and is fully supported by the provided source."
+        }
+      },
+      {
+        "id": "hard-08",
+        "category": "dsa",
+        "answerable": true,
+        "answered": true,
+        "answer": "The deque‑based idea can be generalized to any integer edge weight bounded by a constant \\(k\\) by using a **bucket queue** (Dial’s algorithm).  \n- Keep \\(k+1\\) buckets that hold vertices whose current tentative distance differs from the current minimum by at most \\(k\\).  \n- When the bucket for the smallest distance becomes empty, perform a cyclic shift to bring the next bucket (the one with the next higher distance) to the front.  \n- This guarantees that the distance of any vertex in the queue is at most \\(k\\) larger than the distance of the vertex currently being processed, so the algorithm still runs in linear time relative to the number of edges \\([1]\\).",
+        "cited": [
+          1
+        ],
+        "invalid_citations": [],
+        "n_sources": 2,
+        "total_ms": 4216,
+        "provider": "groq",
+        "model": "openai/gpt-oss-20b",
+        "judge": {
+          "correctness": 1.0,
+          "faithfulness": 1.0,
+          "reason": "The answer accurately restates the key points about using k+1 buckets and cyclic shifts from the source without adding unsupported information."
+        }
+      },
+      {
+        "id": "hard-09",
+        "category": "dsa",
+        "answerable": true,
+        "answered": true,
+        "answer": "The **Disjoint Set Union (DSU)** data structure (also known as Union‑Find) is used to merge trees quickly when constructing a minimum spanning tree greedily by edge weight. It allows near‑constant time union and find operations, enabling the algorithm to efficiently determine whether adding an edge would create a cycle and to merge the corresponding components. [2]",
+        "cited": [
+          2
+        ],
+        "invalid_citations": [],
+        "n_sources": 5,
+        "total_ms": 3880,
+        "provider": "groq",
+        "model": "openai/gpt-oss-20b",
+        "judge": {
+          "correctness": 0.9,
+          "faithfulness": 0.85,
+          "reason": "The answer correctly identifies DSU as the structure for fast merging, matching the reference, but adds an unsupported claim about near‑constant time operations."
+        }
+      },
+      {
+        "id": "hard-10",
+        "category": "system-design",
+        "answerable": true,
+        "answered": true,
+        "answer": "After sketching the main boxes and connections, you **justify your ideas**—explain why each component is included, how they interact, and the trade‑offs you considered. This demonstrates your reasoning and design decisions to the interviewer.",
+        "cited": [],
+        "invalid_citations": [],
+        "n_sources": 1,
+        "total_ms": 3134,
+        "provider": "groq",
+        "model": "openai/gpt-oss-20b",
+        "judge": {
+          "correctness": 0.2,
+          "faithfulness": 0.9,
+          "reason": "The answer matches the source about justifying ideas but omits the reference's emphasis on designing core components and detailed dive."
+        }
+      }
+    ]
+  }
+}
