@@ -1,0 +1,97 @@
+# Two ways to run (sized for an 8 GB laptop):
+#
+#   Lite (default): Postgres + API + web. Ingestion runs inside the API process.
+#       docker compose up --build
+#
+#   Full: adds Redis + a Celery worker. Ingestion runs in the worker.
+#       INGESTION_MODE=celery REDIS_URL=redis://redis:6379/0 docker compose --profile full up --build
+#   (or put those two variables in .env; `make up-full` does this for you)
+#
+# Approximate memory: db ~150 MB, api ~450 MB (embedding + reranker), web ~10 MB,
+# redis ~10 MB, worker ~400 MB.
+
+x-backend-env: &backend-env
+  DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-techprep}:${POSTGRES_PASSWORD:-techprep}@db:5432/${POSTGRES_DB:-techprep}
+  INGESTION_MODE: ${INGESTION_MODE:-inline}
+  REDIS_URL: ${REDIS_URL:-}
+  UPLOAD_DIR: /data/uploads
+  MODEL_CACHE_DIR: /models
+
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-techprep}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-techprep}
+      POSTGRES_DB: ${POSTGRES_DB:-techprep}
+    command: ["postgres", "-c", "shared_buffers=128MB", "-c", "max_connections=40"]
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    mem_limit: 512m
+
+  api:
+    build: ./backend
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      <<: *backend-env
+      WARMUP_MODELS: "true"
+    volumes:
+      - uploads:/data/uploads
+      - models:/models
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    mem_limit: 1g
+
+  web:
+    build: ./frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      - api
+    mem_limit: 64m
+
+  redis:
+    image: redis:7-alpine
+    profiles: ["full"]
+    command: ["redis-server", "--maxmemory", "64mb", "--maxmemory-policy", "noeviction"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      retries: 10
+    mem_limit: 96m
+
+  worker:
+    build: ./backend
+    profiles: ["full"]
+    command: ["celery", "-A", "app.workers.celery_app", "worker", "--loglevel=INFO", "--concurrency=1"]
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      <<: *backend-env
+    volumes:
+      - uploads:/data/uploads
+      - models:/models
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    mem_limit: 1g
+
+volumes:
+  pgdata:
+  uploads:
+  models:
