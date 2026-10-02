@@ -1,0 +1,59 @@
+# ---- Secrets: never commit ----
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# ---- Personal data: never commit ----
+data/private/
+data/uploads/
+uploads/
+*resume*
+*Resume*
+*my_profile*
+*.pdf
+*.docx
+*.doc
+*.lnk
+*.jpg
+*.jpeg
+*.heic
+
+# ---- Python ----
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+coverage.xml
+htmlcov/
+*.egg-info/
+
+# ---- Local Postgres (pgserver dev database) ----
+.pgdata/
+backend/.pgdata/
+
+# ---- Model caches ----
+.fastembed_cache/
+**/fastembed_cache/
+local_cache/
+
+# ---- Node ----
+node_modules/
+dist/
+*.tsbuildinfo
+coverage/
+
+# ---- Editors / OS ----
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ---- Legacy code kept locally only during the rewrite ----
+frontend_legacy/
