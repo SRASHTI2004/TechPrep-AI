@@ -84,7 +84,8 @@ class Settings(BaseSettings):
     gemini_api_key: str | None = None
     gemini_model: str = "gemini-2.5-flash"
     groq_api_key: str | None = None
-    groq_model: str = "llama-3.1-8b-instant"
+    groq_model: str = "openai/gpt-oss-20b"
+    groq_reasoning_effort: str | None = "low"  # gpt-oss models only; None to omit
     llm_temperature: float = 0.1
     llm_max_tokens: int = 1024
     llm_timeout_seconds: float = 60.0
@@ -93,7 +94,7 @@ class Settings(BaseSettings):
 
     # --- Evaluation (offline only) ---
     eval_judge_provider: Literal["gemini", "groq", "fake"] = "groq"
-    eval_judge_model: str = "llama-3.3-70b-versatile"
+    eval_judge_model: str = "openai/gpt-oss-120b"
 
     first_admin_email: str | None = Field(
         default=None, description="If set, this email is given the admin role on registration."

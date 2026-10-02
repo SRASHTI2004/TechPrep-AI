@@ -53,4 +53,4 @@ ignore = ["B008"]  # FastAPI's Depends() in defaults is idiomatic
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-q"
-filterwarnings = ["ignore::DeprecationWarning"]
+filterwarnings = ["ignore::DeprecationWarning", "ignore:Using `httpx` with:Warning"]

@@ -40,6 +40,10 @@ def ready():
         except Exception as exc:
             checks["redis"] = f"error: {type(exc).__name__}"
 
+    from app.rag.embeddings import embedder_loaded
+
+    checks["embedding_model"] = "loaded" if embedder_loaded() else "lazy (loads on first use)"
+
     healthy = all(not v.startswith("error") for v in checks.values())
     return JSONResponse(
         status_code=200 if healthy else 503,

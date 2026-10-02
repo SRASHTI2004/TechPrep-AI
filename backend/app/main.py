@@ -20,6 +20,13 @@ async def lifespan(app: FastAPI):
     settings = get_settings()
     log = get_logger("startup")
     settings.upload_dir.mkdir(parents=True, exist_ok=True)
+    if settings.warmup_models:  # load models at startup instead of on the first request
+        from app.rag.embeddings import get_embedder
+        from app.rag.reranker import get_reranker
+
+        get_embedder()
+        if settings.reranker_enabled:
+            get_reranker()
     log.info(
         "app_started",
         env=settings.env,
