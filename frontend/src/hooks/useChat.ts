@@ -58,12 +58,15 @@ export function useChat(
   const queryClient = useQueryClient();
   const [messages, setMessages] = useState<UiMessage[]>([]);
   const [loadingHistory, setLoadingHistory] = useState(false);
+  const [historyError, setHistoryError] = useState<string | null>(null);
+  const [reloadCount, setReloadCount] = useState(0);
   const [busy, setBusy] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
   // Set when *we* just created this conversation, so we don't refetch it mid-stream.
   const createdHereRef = useRef<string | null>(null);
 
   useEffect(() => {
+    setHistoryError(null);
     if (!conversationId) {
       setMessages([]);
       return;
@@ -71,15 +74,22 @@ export function useChat(
     if (createdHereRef.current === conversationId) return;
     let cancelled = false;
     setLoadingHistory(true);
+    setMessages([]);
     conversationsApi
       .get(conversationId)
       .then((c) => !cancelled && setMessages(c.messages.map(fromStored)))
-      .catch(() => !cancelled && setMessages([]))
+      .catch((err) => {
+        if (cancelled) return;
+        setMessages([]);
+        setHistoryError(err instanceof ApiError ? err.message : "Connection lost. Please try again.");
+      })
       .finally(() => !cancelled && setLoadingHistory(false));
     return () => {
       cancelled = true;
     };
-  }, [conversationId]);
+  }, [conversationId, reloadCount]);
+
+  const reloadHistory = useCallback(() => setReloadCount((n) => n + 1), []);
 
   useEffect(() => () => abortRef.current?.abort(), []);
 
@@ -165,5 +175,5 @@ export function useChat(
     setMessages((ms) => ms.map((m) => (m.id === messageId ? { ...m, feedback: value } : m)));
   }, []);
 
-  return { messages, loadingHistory, busy, send, stop, setFeedback };
+  return { messages, loadingHistory, historyError, reloadHistory, busy, send, stop, setFeedback };
 }

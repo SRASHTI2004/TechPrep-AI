@@ -6,7 +6,9 @@ import { BrowserRouter } from "react-router-dom";
 import App from "./App";
 import { ApiError } from "./api/client";
 import { AuthProvider } from "./auth/AuthContext";
+import { Toaster } from "./components/ui/toaster";
 import "./index.css";
+import { ThemeProvider } from "./theme/ThemeProvider";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -21,12 +23,15 @@ const queryClient = new QueryClient({
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-        <AuthProvider>
-          <App />
-        </AuthProvider>
-      </BrowserRouter>
-    </QueryClientProvider>
+    <ThemeProvider>
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+          <AuthProvider>
+            <App />
+          </AuthProvider>
+        </BrowserRouter>
+      </QueryClientProvider>
+      <Toaster />
+    </ThemeProvider>
   </StrictMode>,
 );

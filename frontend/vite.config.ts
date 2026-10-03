@@ -8,6 +8,24 @@ const API_TARGET = process.env.VITE_PROXY_TARGET ?? "http://127.0.0.1:8000";
 
 export default defineConfig({
   plugins: [react()],
+  build: {
+    rollupOptions: {
+      output: {
+        // Long-lived vendor chunks cache well across app deploys.
+        manualChunks: {
+          react: ["react", "react-dom", "react-router-dom", "@tanstack/react-query"],
+          markdown: ["react-markdown", "remark-gfm"],
+          ui: [
+            "@radix-ui/react-alert-dialog",
+            "@radix-ui/react-dialog",
+            "@radix-ui/react-dropdown-menu",
+            "@radix-ui/react-popover",
+            "sonner",
+          ],
+        },
+      },
+    },
+  },
   server: {
     port: 5173,
     proxy: {

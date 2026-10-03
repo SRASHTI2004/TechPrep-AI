@@ -188,7 +188,6 @@ test("clicking a citation chip highlights its source", async () => {
 test("copy, rename and delete", async () => {
   const writeText = vi.fn().mockResolvedValue(undefined);
   Object.defineProperty(navigator, "clipboard", { value: { writeText }, configurable: true });
-  vi.spyOn(window, "confirm").mockReturnValue(true);
   renderAt("/chat/conv-1");
   await waitFor(() => expect(screen.getByText(/Sharding splits data/)).toBeInTheDocument());
 
@@ -208,8 +207,11 @@ test("copy, rename and delete", async () => {
     ).toBe(true),
   );
 
+  // Delete asks for confirmation in a dialog first.
   await userEvent.click(screen.getByRole("button", { name: /Delete conversation/ }));
-  expect(window.confirm).toHaveBeenCalled();
+  const dialog = await screen.findByRole("alertdialog");
+  expect(within(dialog).getByText(/cannot be undone/)).toBeInTheDocument();
+  await userEvent.click(within(dialog).getByRole("button", { name: "Delete" }));
   await waitFor(() =>
     expect(
       vi.mocked(fetch).mock.calls.some(
@@ -235,4 +237,50 @@ test("Summarize sends a summary request and shows progress", async () => {
   expect(streamBody()).toMatchObject({ mode: "summary", document_ids: null });
   expect(screen.getByText("summary")).toBeInTheDocument();
   expect(screen.getByText(/document section · cited/)).toBeInTheDocument();
+});
+
+test("a conversation that fails to load shows an error with retry", async () => {
+  const ok = vi.mocked(fetch).getMockImplementation()!;
+  let fail = true;
+  vi.mocked(fetch).mockImplementation(async (url, init) =>
+    fail && String(url).endsWith("/conversations/conv-1")
+      ? new Response(JSON.stringify({ detail: "Server error" }), { status: 500 })
+      : ok(url, init),
+  );
+  renderAt("/chat/conv-1");
+  expect(await screen.findByText("Could not load this conversation")).toBeInTheDocument();
+  expect(screen.getByText("Server error")).toBeInTheDocument();
+
+  fail = false;
+  await userEvent.click(screen.getByRole("button", { name: /Try again/ }));
+  expect(await screen.findByText(/Sharding splits data/)).toBeInTheDocument();
+});
+
+test("answers render as Markdown, with no raw symbols while streaming", async () => {
+  const events: [string, unknown][] = [
+    ["meta", { conversation_id: "conv-1", user_message_id: "u1", rewritten_question: null, mode: "qa" }],
+    ["sources", [source]],
+    ["token", { text: "## Sharding\n\n- **Pros**: scale [1]\n- **Cons**: cross-shard " }],
+    ["token", { text: "**joins" }],
+  ];
+  // A stream that stays open, so the answer is still "streaming" when we look at it.
+  const open = new ReadableStream<Uint8Array>({
+    start(controller) {
+      const text = events.map(([e, d]) => `event: ${e}\ndata: ${JSON.stringify(d)}\n\n`).join("");
+      controller.enqueue(new TextEncoder().encode(text));
+    },
+  });
+  const ok = vi.mocked(fetch).getMockImplementation()!;
+  vi.mocked(fetch).mockImplementation(async (url, init) =>
+    String(url).endsWith("/chat/stream") ? new Response(open, { status: 200 }) : ok(url, init),
+  );
+  renderAt("/chat");
+  await userEvent.type(screen.getByLabelText("Your question"), "Explain sharding{Enter}");
+
+  expect(await screen.findByRole("heading", { name: "Sharding" })).toBeInTheDocument();
+  expect(screen.getAllByRole("listitem").length).toBeGreaterThanOrEqual(2);
+  expect(screen.getByText("Pros").tagName).toBe("STRONG");
+  // The half-streamed "**joins" is shown bold, not with literal asterisks.
+  expect(screen.getByText("joins").tagName).toBe("STRONG");
+  expect(screen.queryByText(/\*\*/)).toBeNull();
 });

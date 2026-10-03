@@ -14,12 +14,27 @@ Everything is free or open source and sized for an **8 GB laptop**: local embedd
 (bge-small) and reranker (MiniLM) on CPU, Postgres + pgvector instead of a separate vector DB,
 and free-tier LLMs (Gemini primary, Groq fallback).
 
-<!-- SCREENSHOTS: add docs/screenshots/chat.png, documents.png, login.png and uncomment.
-![Chat with citations](docs/screenshots/chat.png)
-![Documents](docs/screenshots/documents.png)
--->
-> 📸 **Screenshots:** _placeholder. Run the app and add `docs/screenshots/chat.png` and
-> `docs/screenshots/documents.png` (see "What you need to do" in docs/PROGRESS.md)._
+![Chat with a cited answer and its sources](docs/screenshots/chat.png)
+
+<table>
+  <tr>
+    <td width="50%"><img src="docs/screenshots/chat-dark.png" alt="Chat in dark mode"></td>
+    <td width="50%"><img src="docs/screenshots/documents.png" alt="Documents page with ingestion status"></td>
+  </tr>
+  <tr>
+    <td><img src="docs/screenshots/login.png" alt="Landing and sign-in page"></td>
+    <td><img src="docs/screenshots/new-chat-dark.png" alt="New chat with suggested questions"></td>
+  </tr>
+</table>
+
+<p align="center">
+  <img src="docs/screenshots/mobile-chat.png" alt="Chat on a phone" width="240">
+  &nbsp;
+  <img src="docs/screenshots/mobile-sources.png" alt="Sources sheet on a phone" width="240">
+</p>
+
+<sub>Screenshots come from the real production build with sample data
+(`cd frontend && npm run build && npm run screenshots`, which mocks the API, so no backend or LLM is needed).</sub>
 
 ---
 
@@ -156,6 +171,7 @@ How to read it, and its limits, are covered in [docs/INTERVIEW_NOTES.md](docs/IN
 | Reranker | `ms-marco-MiniLM-L-6-v2` cross-encoder (ONNX, CPU) | Biggest precision gain per MB; toggleable. |
 | LLM | Provider-agnostic router: Gemini → Groq (`gpt-oss-20b`), fake for tests | No vendor lock-in, survives rate limits/outages, deterministic tests. |
 | Frontend | React 18 + TypeScript + Vite, React Router, TanStack Query | Typed API layer, cached server state, fast dev loop. |
+| UI | Tailwind CSS + shadcn/ui-style components (Radix primitives), lucide icons, sonner toasts | One token-based design system (light + dark), accessible dialogs/menus, responsive down to phones. |
 | Ops | Docker Compose (lite/full profiles), GitHub Actions, structlog JSON logs, slowapi rate limits, health probes | Same patterns as production services, sized for a laptop. |
 
 ## Quick start
@@ -237,8 +253,10 @@ backend/
   alembic/         migrations 0001–0004
   eval/            dataset.jsonl, metrics, run_eval.py, reports/
   tests/           94 pytest tests
-frontend/src/      api/, auth/, hooks/ (useChat, useSpeechRecognition), pages/, components/,
-                   lib/ (SSE parser, citations, source ordering)
+frontend/src/      api/, auth/, hooks/ (useChat, useSpeechRecognition), pages/, components/
+                   (ui/ = design-system primitives), theme/ (light/dark), lib/ (SSE parser,
+                   citations, source ordering, streaming Markdown)
+frontend/scripts/  screenshots.mjs (README screenshots from the build, API mocked)
 data/sample/       public demo corpus + ATTRIBUTION.md
 docs/              DECISIONS.md, PROGRESS.md, INTERVIEW_NOTES.md
 ```
