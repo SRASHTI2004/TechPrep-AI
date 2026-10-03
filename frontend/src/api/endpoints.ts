@@ -1,6 +1,7 @@
 import { readSse } from "../lib/sse";
 import { apiUrl, authHeaders, ensureOk, request } from "./client";
 import type {
+  AnswerMode,
   ChatDone,
   ChatMeta,
   Citation,
@@ -38,6 +39,11 @@ export const conversationsApi = {
   list: () => request<Conversation[]>("/conversations"),
   get: (id: string) => request<ConversationDetail>(`/conversations/${id}`),
   remove: (id: string) => request<void>(`/conversations/${id}`, { method: "DELETE" }),
+  rename: (id: string, title: string) =>
+    request<Conversation>(`/conversations/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify({ title }),
+    }),
   feedback: (messageId: string, value: 1 | -1) =>
     request<void>(`/messages/${messageId}/feedback`, {
       method: "POST",
@@ -48,6 +54,8 @@ export const conversationsApi = {
 export interface StreamHandlers {
   onMeta?: (meta: ChatMeta) => void;
   onSources?: (sources: Citation[]) => void;
+  /** Progress text while a long summary is being prepared ("Reading part 2 of 4…"). */
+  onStatus?: (text: string) => void;
   onToken?: (text: string) => void;
   onDone?: (done: ChatDone) => void;
   onError?: (detail: string) => void;
@@ -57,6 +65,7 @@ export interface ChatRequest {
   message: string;
   conversation_id?: string | null;
   document_ids?: string[] | null;
+  mode?: "auto" | AnswerMode;
 }
 
 /** POST /chat/stream and dispatch SSE events to handlers. */
@@ -81,6 +90,9 @@ export async function streamChat(
         break;
       case "sources":
         handlers.onSources?.(data as Citation[]);
+        break;
+      case "status":
+        handlers.onStatus?.((data as { text: string }).text);
         break;
       case "token":
         handlers.onToken?.((data as { text: string }).text);

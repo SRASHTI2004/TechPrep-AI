@@ -41,7 +41,10 @@ export default function AnswerMarkdown({ text, sources, activeCitation, onCitati
                 className={`cite-chip${activeCitation === n ? " active" : ""}`}
                 title={label}
                 aria-label={`Show source ${n}: ${label}`}
-                onClick={() => onCitationClick?.(n)}
+                onClick={(e) => {
+                  e.stopPropagation(); // the answer bubble's own click would reset the selection
+                  onCitationClick?.(n);
+                }}
               >
                 {n}
               </button>

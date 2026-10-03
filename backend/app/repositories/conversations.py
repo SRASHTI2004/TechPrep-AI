@@ -58,5 +58,10 @@ class ConversationRepository:
             .where(Message.id == message_id, Conversation.owner_id == owner_id)
         )
 
+    def rename(self, conversation: Conversation, title: str) -> Conversation:
+        conversation.title = title[:200]
+        self.db.flush()
+        return conversation
+
     def delete(self, conversation: Conversation) -> None:
         self.db.delete(conversation)

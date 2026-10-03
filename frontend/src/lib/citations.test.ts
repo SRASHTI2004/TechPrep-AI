@@ -1,4 +1,9 @@
-import { citationNumberFromHref, formatLocation, linkifyCitations } from "./citations";
+import {
+  citationNumberFromHref,
+  formatLocation,
+  linkifyCitations,
+  normalizeCitations,
+} from "./citations";
 
 describe("linkifyCitations", () => {
   const valid = new Set([1, 2, 3]);
@@ -16,6 +21,22 @@ describe("linkifyCitations", () => {
   it("never touches code", () => {
     const md = "Use `arr[1]` here [1].\n```py\nx = a[2]\n```";
     expect(linkifyCitations(md, valid)).toBe("Use `arr[1]` here [1](#cite-1).\n```py\nx = a[2]\n```");
+  });
+});
+
+describe("normalizeCitations", () => {
+  it("rewrites 【n】, 【n†…】 and full-width brackets to [n]", () => {
+    expect(normalizeCitations("A 【1】. B 【2†L3-L5】【3】. C ［4］. D 【1，2】.")).toBe(
+      "A [1]. B [2][3]. C [4]. D [1, 2].",
+    );
+  });
+
+  it("leaves canonical markers and code-like brackets alone", () => {
+    expect(normalizeCitations("[1, 2] and arr[1]")).toBe("[1, 2] and arr[1]");
+  });
+
+  it("turns 【n】 into clickable citation links", () => {
+    expect(linkifyCitations("Sharding 【1】.", new Set([1]))).toBe("Sharding [1](#cite-1).");
   });
 });
 

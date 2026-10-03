@@ -1,9 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRef, useState } from "react";
 import type { DragEvent } from "react";
+import { useNavigate } from "react-router-dom";
 
 import { documentsApi } from "../api/endpoints";
 import type { DocumentItem, DocumentStatus } from "../api/types";
+import type { SummarizeRequest } from "./ChatPage";
 
 const ACCEPT = ".pdf,.md,.markdown,.txt";
 const STATUS_LABEL: Record<DocumentStatus, string> = {
@@ -21,6 +23,7 @@ function formatSize(bytes: number): string {
 
 export default function DocumentsPage() {
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const inputRef = useRef<HTMLInputElement>(null);
   const [dragging, setDragging] = useState(false);
   const [uploadErrors, setUploadErrors] = useState<string[]>([]);
@@ -145,6 +148,20 @@ export default function DocumentsPage() {
                   <td>{formatSize(d.size_bytes)}</td>
                   <td>{new Date(d.created_at).toLocaleDateString()}</td>
                   <td className="actions">
+                    {d.status === "ready" && (
+                      <button
+                        className="ghost"
+                        aria-label={`Summarize ${d.filename}`}
+                        onClick={() => {
+                          const state: SummarizeRequest = {
+                            summarize: { id: d.id, filename: d.filename },
+                          };
+                          navigate("/chat", { state });
+                        }}
+                      >
+                        Summarize
+                      </button>
+                    )}
                     {d.status === "failed" && (
                       <button className="ghost" onClick={() => reingest.mutate(d.id)}>
                         Retry

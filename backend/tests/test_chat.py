@@ -184,6 +184,48 @@ def test_delete_conversation(client, auth_headers, notes):
     assert client.get(f"/api/v1/conversations/{conv_id}", headers=auth_headers).status_code == 404
 
 
+def test_every_source_is_persisted_with_its_cited_flag(client, auth_headers, notes):
+    first = _ask(client, auth_headers, "How does sharding split a database?").json()
+    conv_id = first["conversation_id"]
+    second = _ask(
+        client, auth_headers, "How does replication work?", conversation_id=conv_id
+    ).json()
+
+    detail = client.get(f"/api/v1/conversations/{conv_id}", headers=auth_headers).json()
+    answers = [m for m in detail["messages"] if m["role"] == "assistant"]
+    # Each answer keeps its own sources (not just the latest answer's), with cited flags.
+    for stored, live in zip(answers, [first, second], strict=True):
+        assert stored["mode"] == "qa"
+        assert [s["chunk_id"] for s in stored["sources"]] == [
+            s["chunk_id"] for s in live["sources"]
+        ]
+        cited = {c["n"] for c in live["citations"]}
+        assert cited and {s["n"] for s in stored["sources"] if s["cited"]} == cited
+        for s in stored["sources"]:
+            assert {"filename", "page", "section", "snippet", "score", "cited"} <= s.keys()
+
+
+def test_odd_citation_markers_are_normalized(client, auth_headers, notes, monkeypatch):
+    monkeypatch.setattr(
+        "app.rag.llm.fake.FakeProvider.complete",
+        lambda self, messages, **kw: "Sharding splits a database 【1†L1-L2】.",
+    )
+    body = _ask(client, auth_headers, "How does sharding split a database?").json()
+    assert body["answer"] == "Sharding splits a database [1]."
+    assert [c["n"] for c in body["citations"]] == [1]
+
+
+def test_rename_conversation(client, auth_headers, other_auth_headers, notes):
+    conv_id = _ask(client, auth_headers, "What is sharding?").json()["conversation_id"]
+    url = f"/api/v1/conversations/{conv_id}"
+    r = client.patch(url, headers=auth_headers, json={"title": "  Sharding notes  "})
+    assert r.status_code == 200 and r.json()["title"] == "Sharding notes"
+    listed = client.get("/api/v1/conversations", headers=auth_headers).json()
+    assert listed[0]["title"] == "Sharding notes"
+    assert client.patch(url, headers=auth_headers, json={"title": "   "}).status_code == 422
+    assert client.patch(url, headers=other_auth_headers, json={"title": "x"}).status_code == 404
+
+
 def test_validation(client, auth_headers):
     assert _ask(client, auth_headers, "").status_code == 422
     assert _ask(client, auth_headers, "x" * 2001).status_code == 422

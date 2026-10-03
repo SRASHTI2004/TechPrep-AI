@@ -11,6 +11,25 @@ from app.rag.prompts import REFUSAL
 
 _CITATION = re.compile(r"\[(\d{1,2}(?:\s*,\s*\d{1,2})*)\]")
 
+# Some models (e.g. gpt-oss) write citations as 【1】, 【1†L3-L5】 or with full-width
+# brackets ［1］ instead of [1]. Same idea as _CITATION, but any bracket style, full-width
+# commas, and an optional "†..." suffix.
+_ANY_CITATION = re.compile(
+    r"[\[【［]\s*(\d{1,2}(?:\s*[,，、]\s*\d{1,2})*)\s*(?:†[^\]】］\n]*)?[\]】］]"
+)
+
+
+def normalize_citations(text: str) -> str:
+    """Rewrite every citation marker to the canonical [n] / [n, m] form."""
+
+    def repl(match: re.Match[str]) -> str:
+        if _CITATION.fullmatch(match.group(0)):
+            return match.group(0)  # already canonical: leave its spacing untouched
+        numbers = re.split(r"\s*[,，、]\s*", match.group(1).strip())
+        return "[" + ", ".join(numbers) + "]"
+
+    return _ANY_CITATION.sub(repl, text)
+
 
 def extract_citation_numbers(answer: str) -> list[int]:
     """All cited numbers in order of first appearance (may include invalid ones)."""

@@ -3,17 +3,20 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import { ApiError } from "../api/client";
 import { conversationsApi, streamChat } from "../api/endpoints";
-import type { Citation, Latency, StoredMessage } from "../api/types";
+import type { AnswerMode, Citation, Latency, StoredMessage } from "../api/types";
 
 export interface UiMessage {
   key: string;
   id?: string; // server id once known (needed for feedback)
   role: "user" | "assistant";
   content: string;
-  sources: Citation[]; // what the model was given (live) or what it cited (history)
-  cited: number[];
+  sources: Citation[]; // every source the model was given for this answer
+  cited: number[]; // the source numbers the answer cites, in order of first citation
+  mode?: AnswerMode;
   answered?: boolean;
   streaming?: boolean;
+  status?: string; // progress text while a long summary is prepared
+  stopped?: boolean; // the user pressed "Stop generating"
   error?: string;
   feedback?: 1 | -1 | null;
   latency?: Latency;
@@ -21,17 +24,24 @@ export interface UiMessage {
   provider?: string | null;
 }
 
+export interface SendOptions {
+  mode?: "auto" | AnswerMode;
+}
+
 let keySeq = 0;
 const nextKey = () => `m${++keySeq}`;
 
 export function fromStored(m: StoredMessage): UiMessage {
+  const citations = m.citations ?? [];
   return {
     key: m.id,
     id: m.id,
     role: m.role,
     content: m.content,
-    sources: m.citations ?? [],
-    cited: (m.citations ?? []).map((c) => c.n),
+    // Newer messages store every source with a `cited` flag; older ones only their citations.
+    sources: m.sources?.length ? m.sources : citations,
+    cited: citations.map((c) => c.n),
+    mode: m.mode ?? undefined,
     answered: m.answered ?? undefined,
     feedback: m.feedback,
   };
@@ -77,7 +87,7 @@ export function useChat(
     setMessages((ms) => (ms.length ? [...ms.slice(0, -1), patch(ms[ms.length - 1]!)] : ms));
 
   const send = useCallback(
-    async (text: string, documentIds: string[] | null) => {
+    async (text: string, documentIds: string[] | null, options: SendOptions = {}) => {
       if (busy || !text.trim()) return;
       setBusy(true);
       const controller = new AbortController();
@@ -90,27 +100,41 @@ export function useChat(
 
       try {
         await streamChat(
-          { message: text, conversation_id: conversationId, document_ids: documentIds },
+          {
+            message: text,
+            conversation_id: conversationId,
+            document_ids: documentIds,
+            mode: options.mode ?? "auto",
+          },
           {
             onMeta: (meta) => {
               if (!conversationId) {
                 createdHereRef.current = meta.conversation_id;
                 onConversationCreated(meta.conversation_id);
               }
-              patchLast((m) => ({ ...m, rewrittenQuestion: meta.rewritten_question }));
+              patchLast((m) => ({ ...m, rewrittenQuestion: meta.rewritten_question, mode: meta.mode }));
             },
             onSources: (sources) => patchLast((m) => ({ ...m, sources })),
-            onToken: (t) => patchLast((m) => ({ ...m, content: m.content + t })),
+            onStatus: (status) => patchLast((m) => ({ ...m, status })),
+            onToken: (t) => patchLast((m) => ({ ...m, status: undefined, content: m.content + t })),
             onDone: (done) =>
-              patchLast((m) => ({
-                ...m,
-                id: done.message_id,
-                streaming: false,
-                answered: done.answered,
-                cited: done.citations.map((c) => c.n),
-                latency: done.latency,
-                provider: done.provider,
-              })),
+              patchLast((m) => {
+                const cited = done.citations.map((c) => c.n);
+                return {
+                  ...m,
+                  id: done.message_id,
+                  // The stored answer can differ from the streamed text (normalized citations).
+                  content: done.answer ?? m.content,
+                  streaming: false,
+                  status: undefined,
+                  answered: done.answered,
+                  mode: done.mode ?? m.mode,
+                  cited,
+                  sources: m.sources.map((s) => ({ ...s, cited: cited.includes(s.n) })),
+                  latency: done.latency,
+                  provider: done.provider,
+                };
+              }),
             onError: (detail) => patchLast((m) => ({ ...m, streaming: false, error: detail })),
           },
           controller.signal,
@@ -122,7 +146,11 @@ export function useChat(
           patchLast((m) => ({ ...m, streaming: false, error: message }));
         }
       } finally {
-        patchLast((m) => (m.streaming ? { ...m, streaming: false } : m));
+        // Still "streaming" here means the answer never finished: stopped or cut off.
+        const stopped = controller.signal.aborted;
+        patchLast((m) =>
+          m.streaming ? { ...m, streaming: false, status: undefined, stopped } : m,
+        );
         setBusy(false);
         queryClient.invalidateQueries({ queryKey: ["conversations"] });
       }

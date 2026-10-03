@@ -95,6 +95,12 @@ class Settings(BaseSettings):
     query_rewrite_enabled: bool = True
     history_turns: int = 4
 
+    # --- Summaries ("summarize this document": map-reduce over all chunks) ---
+    summary_batch_chars: int = 12000  # source text per LLM call (~3k tokens)
+    summary_max_batches: int = 4  # map calls per summary; longer documents are trimmed evenly
+    summary_max_sources: int = 40  # citeable sections/pages (adjacent ones are merged beyond)
+    summary_map_max_tokens: int = 700
+
     # --- Evaluation (offline only) ---
     eval_judge_provider: Literal["gemini", "groq", "fake"] = "groq"
     eval_judge_model: str = "openai/gpt-oss-120b"

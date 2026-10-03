@@ -12,6 +12,7 @@ from app.schemas.chat import (
     ChatResponse,
     ConversationDetail,
     ConversationOut,
+    ConversationUpdate,
     FeedbackRequest,
 )
 from app.services.chat_service import (
@@ -68,6 +69,19 @@ def get_conversation(conversation_id: UUID, user: CurrentUser, db: DbSession):
     conv = ConversationRepository(db).get_for_owner(conversation_id, user.id)
     if conv is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Conversation not found")
+    return conv
+
+
+@router.patch("/conversations/{conversation_id}", response_model=ConversationOut)
+def rename_conversation(
+    conversation_id: UUID, body: ConversationUpdate, user: CurrentUser, db: DbSession
+):
+    repo = ConversationRepository(db)
+    conv = repo.get_for_owner(conversation_id, user.id)
+    if conv is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Conversation not found")
+    repo.rename(conv, body.title)
+    db.commit()
     return conv
 
 

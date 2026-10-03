@@ -44,7 +44,11 @@ export interface Citation {
   section: string | null;
   snippet: string;
   score: number;
+  /** Set once the answer is final: did the answer cite this source? */
+  cited?: boolean;
 }
+
+export type AnswerMode = "qa" | "summary";
 
 export interface Latency {
   retrieval_ms: number;
@@ -55,7 +59,10 @@ export interface Latency {
 export interface ChatDone {
   conversation_id: string;
   message_id: string;
+  /** The final stored answer (may differ slightly from the streamed tokens). */
+  answer?: string;
   answered: boolean;
+  mode?: AnswerMode;
   citations: Citation[];
   invalid_citations: number[];
   rewritten_question: string | null;
@@ -68,6 +75,7 @@ export interface ChatMeta {
   conversation_id: string;
   user_message_id: string;
   rewritten_question: string | null;
+  mode?: AnswerMode;
 }
 
 export interface Conversation {
@@ -82,6 +90,9 @@ export interface StoredMessage {
   role: "user" | "assistant";
   content: string;
   citations: Citation[];
+  /** Every source the model was given, with `cited` flags (older messages may lack it). */
+  sources?: Citation[];
+  mode?: AnswerMode | null;
   answered: boolean | null;
   feedback: 1 | -1 | null;
   created_at: string;

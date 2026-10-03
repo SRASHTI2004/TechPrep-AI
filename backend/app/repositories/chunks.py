@@ -5,7 +5,7 @@ from sqlalchemy import delete, func, select
 from sqlalchemy.orm import Session
 
 from app.models.chunk import Chunk
-from app.models.document import Document
+from app.models.document import Document, DocumentStatus
 from app.rag.chunking import ChunkDraft
 
 
@@ -50,3 +50,17 @@ class ChunkRepository:
             .order_by(Chunk.chunk_index)
         )
         return list(self.db.scalars(stmt))
+
+    def list_ready_for_owner(
+        self, owner_id: UUID, document_ids: list[UUID] | None = None
+    ) -> list[tuple[Chunk, str]]:
+        """(chunk, filename) for the owner's ready documents, in reading order (for summaries)."""
+        stmt = (
+            select(Chunk, Document.filename)
+            .join(Document, Document.id == Chunk.document_id)
+            .where(Chunk.owner_id == owner_id, Document.status == DocumentStatus.READY)
+            .order_by(Document.created_at, Document.id, Chunk.chunk_index)
+        )
+        if document_ids:
+            stmt = stmt.where(Chunk.document_id.in_(document_ids))
+        return [(chunk, filename) for chunk, filename in self.db.execute(stmt)]

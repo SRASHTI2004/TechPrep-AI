@@ -136,10 +136,18 @@ input:focus, textarea:focus { outline: 2px solid var(--primary-soft); border-col
 }
 .conversations li.active, .conversations li:hover { background: #f0f0f6; }
 .conversations li button { visibility: hidden; }
-.conversations li:hover button { visibility: visible; }
+.conversations li:hover button, .conversations li:focus-within button { visibility: visible; }
+.conversations li button.danger:hover { color: var(--danger); }
+.rename-input { padding: 0.35rem 0.5rem; font-size: 0.9rem; }
 
 .chat { display: flex; flex-direction: column; min-height: 0; }
-.chat-toolbar { padding: 0.6rem 1rem; border-bottom: 1px solid var(--border); background: var(--panel); }
+.chat-toolbar {
+  padding: 0.6rem 1rem; border-bottom: 1px solid var(--border); background: var(--panel);
+  display: flex; align-items: center; gap: 0.8rem;
+}
+.summarize-btn { margin-left: auto; font-size: 0.85rem; padding: 0.35rem 0.75rem; }
+.scope-row { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
+.scope-row button { font-size: 0.78rem; white-space: nowrap; }
 .scope { position: relative; font-size: 0.88rem; }
 .scope summary { cursor: pointer; color: var(--muted); }
 .scope-menu {
@@ -163,7 +171,10 @@ input:focus, textarea:focus { outline: 2px solid var(--primary-soft); border-col
 .msg.assistant .bubble {
   background: var(--panel); border: 1px solid var(--border); border-radius: 14px 14px 14px 4px;
 }
-.msg.assistant.selected .bubble { border-color: #c9c6f7; }
+.msg.assistant { cursor: pointer; }
+.msg.assistant:focus-visible { outline: none; }
+.msg.assistant:focus-visible .bubble { outline: 2px solid var(--primary-soft); }
+.msg.assistant.selected .bubble { border-color: #c9c6f7; box-shadow: inset 3px 0 0 var(--primary); }
 .msg-meta { display: flex; gap: 0.8rem; align-items: center; padding: 0.2rem 0.4rem; }
 .feedback { margin-left: auto; }
 
@@ -198,6 +209,19 @@ button.cite-chip:hover, .cite-chip.active { background: var(--primary); color: #
 }
 .composer textarea { resize: none; }
 
+/* voice input */
+.voice { display: flex; flex-direction: column; gap: 0.3rem; align-self: stretch; justify-content: flex-end; }
+.voice-controls { display: flex; gap: 0.3rem; align-items: center; }
+.voice-lang { font: inherit; font-size: 0.78rem; padding: 0.3rem; border: 1px solid var(--border); border-radius: 8px; background: #fff; }
+button.mic { padding: 0.45rem 0.6rem; line-height: 1; }
+button.mic.listening { background: #fdecea; border-color: var(--danger); color: var(--danger); }
+.voice-status { margin: 0; font-size: 0.78rem; color: var(--muted); max-width: 220px; }
+.voice-status em { color: var(--text); }
+.rec-dot {
+  display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--danger);
+  margin-right: 0.2rem; animation: blink 1s infinite;
+}
+
 .sources { border-left: 1px solid var(--border); background: var(--panel); padding: 1rem; overflow-y: auto; }
 .sources ol { list-style: none; padding: 0; margin: 0.6rem 0 0; display: flex; flex-direction: column; gap: 0.6rem; }
 .source-card {
@@ -211,6 +235,9 @@ button.cite-chip:hover, .cite-chip.active { background: var(--primary); color: #
 .source-file { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .source-loc { margin-left: auto; color: var(--muted); white-space: nowrap; font-size: 0.78rem; }
 .source-section { margin-top: 0.2rem; }
+.sources-for { margin: 0 0 0.4rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.other-sources { margin-top: 0.8rem; }
+.other-toggle { text-align: left; font-size: 0.85rem; }
 .snippet { font-size: 0.83rem; margin: 0.4rem 0; color: #3a3a4c; white-space: pre-wrap; overflow-wrap: anywhere; }
 
 @media (max-width: 1100px) {

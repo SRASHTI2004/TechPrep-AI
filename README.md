@@ -29,9 +29,12 @@ and free-tier LLMs (Gemini primary, Groq fallback).
 |---|---|
 | 📄 **Upload** | PDF, Markdown or text (≤ 20 MB). Ingestion runs in the background (Celery worker or in-process), and the UI shows `queued → processing → ready / failed`. |
 | 🔎 **Hybrid retrieval** | pgvector semantic search **plus** Postgres full-text keyword search, fused with Reciprocal Rank Fusion, then reranked by a cross-encoder. One SQL query, always filtered by the owner. |
-| 📌 **Citations** | Every answer cites numbered sources: `[1]` → `lecture.pdf, p. 14` or `system_design.md › Cache › Write-through`. Citation numbers are validated server-side, and invented ones are never linked. |
+| 📌 **Citations** | Every answer cites numbered sources: `[1]` → `lecture.pdf, p. 14` or `system_design.md › Cache › Write-through`. Citation numbers are validated server-side, and invented ones are never linked. Odd model formats like `【1】` / `【1†L3】` are normalized to `[1]` and shown as clickable chips that highlight the source. |
+| 🗂️ **Sources panel** | Every retrieved passage (file, page, section, snippet, relevance, cited or not) is **stored per answer**, so clicking any older answer shows *its* sources. Cited sources come first; low-relevance uncited passages are collapsed under "Other retrieved passages". |
+| 📝 **Summaries** | "Give me a summary of the doc", "tl;dr", or the **Summarize** buttons: the whole document (selected ones, or all) is summarized with map-reduce over its sections/pages, with citations to them. Normal retrieval would answer "I don't know" here, because a summary request has no topic words to search for. |
+| 🎤 **Voice input** | Mic button next to the text box (browser Web Speech API), English or Hindi, listening indicator, clear message when the browser doesn't support it. |
 | 🙅 **"I don't know"** | If nothing relevant is retrieved, the API refuses **without calling the LLM**. The prompt also tells the model to refuse when sources don't cover the question. |
-| 💬 **Conversations** | History is persisted; follow-ups ("what about the pull type?") are rewritten into standalone questions before retrieval. |
+| 💬 **Conversations** | History is persisted; follow-ups ("what about the pull type?") are rewritten into standalone questions before retrieval. Rename and delete chats, copy an answer, stop generating. |
 | ⚡ **Streaming** | Server-Sent Events: sources arrive first, then tokens, then validated citations. |
 | 🔐 **Multi-user** | JWT auth, `user`/`admin` roles. Users only ever see and search their own documents (enforced in SQL and tested). |
 | 📊 **Evaluation** | A 50-question test set with a script that reports Hit@k / MRR, refusal accuracy, LLM-judged correctness and faithfulness, and citation validity, plus ablations. |
@@ -76,8 +79,35 @@ sequenceDiagram
     API->>L: system rules + numbered sources + history + question
     L-->>U: event: token … token
     API->>DB: save message + validated citations + query log
-    API-->>U: event: done {citations, latency, provider}
+    API-->>U: event: done {answer, citations, latency, provider}
   end
+```
+
+**Summary request** ("summarize this document", or a Summarize button):
+
+```mermaid
+sequenceDiagram
+  participant U as User
+  participant API as ChatService
+  participant DB as Postgres
+  participant L as LLM
+  U->>API: POST /chat/stream {message, mode: "auto" | "summary", document_ids?}
+  API->>API: summary intent? (or explicit mode) → skip retrieval
+  API->>DB: every chunk of the selected documents, in reading order
+  API->>API: group into ≤ 40 citeable sections/pages, plan batches
+  API-->>U: event: sources [1..n]
+  alt fits in one prompt
+    API->>L: summarize with numbered sources
+  else long document (map-reduce)
+    loop each batch (≤ 4)
+      API-->>U: event: status "Reading part i of n…"
+      API->>L: cited bullet notes for this batch (map)
+    end
+    API->>L: merge notes into the final summary (reduce)
+    API->>API: restore citations the reduce step dropped (word overlap with notes)
+  end
+  L-->>U: event: token … token
+  API-->>U: event: done {answer, citations}
 ```
 
 ## Evaluation results
@@ -169,7 +199,7 @@ npm run dev                                   # http://localhost:5173 (proxies /
 ### Tests, lint, eval
 
 ```bash
-cd backend && uv run --group localdb pytest   # 65 tests, real Postgres, fake LLM + embeddings
+cd backend && uv run --group localdb pytest   # 94 tests, real Postgres, fake LLM + embeddings
 cd backend && uv run ruff check . && uv run ruff format --check .
 cd frontend && npm test && npm run lint && npm run typecheck
 cd backend && uv run python -m eval.run_eval --retrieval-only     # no LLM calls, ~3 min
@@ -184,9 +214,9 @@ cd backend && uv run python -m eval.run_eval                      # + LLM-judged
 | POST | `/api/v1/documents` | Upload (202, ingested in background) |
 | GET / DELETE | `/api/v1/documents[/{id}]` | List / status / delete (chunks cascade) |
 | POST | `/api/v1/documents/{id}/reingest` | Retry a failed or re-chunk a document |
-| POST | `/api/v1/chat` | Answer as JSON (used by eval and API clients) |
-| POST | `/api/v1/chat/stream` | Answer as SSE: `meta`, `sources`, `token`…, `done` \| `error` |
-| GET / DELETE | `/api/v1/conversations[/{id}]` | History |
+| POST | `/api/v1/chat` | Answer as JSON (used by eval and API clients). Body: `message`, `conversation_id?`, `document_ids?`, `mode` = `auto` \| `qa` \| `summary` |
+| POST | `/api/v1/chat/stream` | Answer as SSE: `meta`, `sources`, `status`… (summaries), `token`…, `done` \| `error` |
+| GET / PATCH / DELETE | `/api/v1/conversations[/{id}]` | History (each answer with all its sources) / rename / delete |
 | POST | `/api/v1/messages/{id}/feedback` | 👍 / 👎 |
 | GET | `/api/v1/admin/stats` | Admin only: counts, answer rate, p95 latency, feedback |
 | GET | `/health`, `/health/ready` | Liveness / readiness (DB, Redis, model) |
@@ -201,12 +231,14 @@ backend/
     db/, models/   SQLAlchemy models, session
     repositories/  all SQL; every read is owner-scoped
     services/      auth, documents, ingestion, chat (the RAG flow)
-    rag/           loaders, chunking, embeddings, reranker, retrieval, prompts, citations, llm/
+    rag/           loaders, chunking, embeddings, reranker, retrieval, summarize, prompts,
+                   citations, llm/
     workers/       Celery app + tasks, dispatch (celery | inline)
-  alembic/         migrations 0001–0003
+  alembic/         migrations 0001–0004
   eval/            dataset.jsonl, metrics, run_eval.py, reports/
-  tests/           65 pytest tests
-frontend/src/      api/, auth/, hooks/useChat, pages/, components/, lib/ (SSE parser, citations)
+  tests/           94 pytest tests
+frontend/src/      api/, auth/, hooks/ (useChat, useSpeechRecognition), pages/, components/,
+                   lib/ (SSE parser, citations, source ordering)
 data/sample/       public demo corpus + ATTRIBUTION.md
 docs/              DECISIONS.md, PROGRESS.md, INTERVIEW_NOTES.md
 ```
@@ -226,7 +258,10 @@ docs/              DECISIONS.md, PROGRESS.md, INTERVIEW_NOTES.md
 See [docs/INTERVIEW_NOTES.md](docs/INTERVIEW_NOTES.md#honest-limitations). In short: no OCR for
 scanned PDFs, CPU reranking costs about 2 s per question on a laptop, the eval set is small and
 written by the author, and tokens live in `localStorage` (no refresh tokens, by design for this
-scope).
+scope). Summaries of long documents take several LLM calls (about a minute on Groq's free tier)
+and trim each section evenly beyond ~48k characters; summaries are not covered by the eval yet.
+Voice input uses the browser's speech service (Chrome sends audio to Google; Firefox has none).
+A stopped answer is not saved.
 
 ## License
 
