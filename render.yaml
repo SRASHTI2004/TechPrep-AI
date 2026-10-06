@@ -1,0 +1,66 @@
+# Render Blueprint: free API (Docker) + free static frontend. Database: Neon (see docs/DEPLOYMENT.md).
+# Values marked `sync: false` are asked for once when the Blueprint is created.
+services:
+  - type: web
+    name: techprep-ai-api
+    runtime: docker
+    plan: free
+    region: singapore
+    dockerContext: ./backend
+    dockerfilePath: ./backend/Dockerfile
+    healthCheckPath: /health
+    buildFilter:
+      paths: ["backend/**"]
+    envVars:
+      - key: ENV
+        value: prod
+      - key: PORT
+        value: "8000"
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GROQ_API_KEY
+        sync: false
+      - key: CORS_ORIGINS
+        sync: false
+      # Free plan = 512 MB RAM and 0.1 CPU: bake the model into the image, run ONNX
+      # single-threaded in small batches, and skip the cross-encoder (too slow on 0.1 CPU).
+      - key: PRELOAD_MODELS
+        value: "true"
+      - key: MODEL_CACHE_DIR
+        value: /models
+      - key: WARMUP_MODELS
+        value: "true"
+      - key: RERANKER_ENABLED
+        value: "false"
+      - key: ONNX_THREADS
+        value: "1"
+      - key: ONNX_BATCH_SIZE
+        value: "4"
+      - key: MALLOC_ARENA_MAX
+        value: "2"
+      - key: LOG_JSON
+        value: "true"
+
+  - type: web
+    name: techprep-ai
+    runtime: static
+    rootDir: frontend
+    buildCommand: npm ci && npm run build
+    staticPublishPath: dist
+    buildFilter:
+      paths: ["frontend/**"]
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: VITE_API_URL
+        sync: false
+      - key: VITE_DEMO_EMAIL
+        sync: false
+      - key: VITE_DEMO_PASSWORD
+        sync: false

@@ -64,6 +64,7 @@ class Settings(BaseSettings):
     reranker_model: str = "Xenova/ms-marco-MiniLM-L-6-v2"
     warmup_models: bool = False
     onnx_threads: int | None = None  # None = ONNX default (all cores); try physical core count
+    onnx_batch_size: int = 32  # texts per model call; smaller uses less RAM (4 fits a 512 MB host)
 
     # --- Chunking ---
     chunk_size: int = 1000

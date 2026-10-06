@@ -35,6 +35,7 @@ class FastEmbedEmbedder:
         query_prefix: str = "",
         cache_dir: str | None = None,
         threads: int | None = None,
+        batch_size: int = 32,
     ):
         from fastembed import TextEmbedding
 
@@ -43,11 +44,12 @@ class FastEmbedEmbedder:
         self._lock = threading.Lock()  # ONNX session is shared across request threads
         self.model_name = model_name
         self.query_prefix = query_prefix
+        self.batch_size = batch_size
         self.dim = len(self.embed_query("dimension probe"))
 
     def embed_documents(self, texts: list[str]) -> list[list[float]]:
         with self._lock:
-            return [v.tolist() for v in self._model.embed(texts, batch_size=32)]
+            return [v.tolist() for v in self._model.embed(texts, batch_size=self.batch_size)]
 
     def embed_query(self, text: str) -> list[float]:
         with self._lock:
@@ -97,6 +99,7 @@ def get_embedder() -> Embedder:
             query_prefix=settings.embedding_query_prefix,
             cache_dir=settings.model_cache_dir,
             threads=settings.onnx_threads,
+            batch_size=settings.onnx_batch_size,
         )
     if embedder.dim != settings.embedding_dim:
         raise RuntimeError(
