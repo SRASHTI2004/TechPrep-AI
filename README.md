@@ -4,6 +4,8 @@
 If the answer isn't in your documents, it says *"I don't know based on your documents."*
 instead of guessing.
 
+**[Live demo](https://techprep-ai.vercel.app)** · click *Try the demo account* (the free backend may take ~1 min to wake up)
+
 ![CI](https://github.com/SRASHTI2004/TechPrep-AI/actions/workflows/ci.yml/badge.svg)
 ![Python](https://img.shields.io/badge/python-3.12-blue)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.11x-009688)
@@ -211,6 +213,10 @@ cd ../frontend
 npm ci
 npm run dev                                   # http://localhost:5173 (proxies /api to :8000)
 ```
+
+### Deploy for free
+
+Neon (Postgres + pgvector) + Hugging Face Spaces (API) + Vercel (web). Step by step: [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
 
 ### Tests, lint, eval
 

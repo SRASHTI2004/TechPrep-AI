@@ -32,6 +32,10 @@ const FEATURES = [
   },
 ];
 
+// Optional shared demo account (set on the hosted build) so visitors can try it without signing up.
+const DEMO_EMAIL = import.meta.env.VITE_DEMO_EMAIL as string | undefined;
+const DEMO_PASSWORD = import.meta.env.VITE_DEMO_PASSWORD as string | undefined;
+
 /** A static mock of an answer, to show what the product does at a glance. */
 function AnswerPreview() {
   return (
@@ -91,19 +95,22 @@ export default function LoginPage() {
   const from = (location.state as { from?: string } | null)?.from ?? "/chat";
   if (user) return <Navigate to={from} replace />;
 
-  async function onSubmit(e: FormEvent) {
-    e.preventDefault();
+  async function signIn(action: () => Promise<void>) {
     setBusy(true);
     setError(null);
     try {
-      if (mode === "login") await login(email, password);
-      else await register(email, password);
+      await action();
       navigate(from, { replace: true });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
     } finally {
       setBusy(false);
     }
+  }
+
+  function onSubmit(e: FormEvent) {
+    e.preventDefault();
+    void signIn(() => (mode === "login" ? login(email, password) : register(email, password)));
   }
 
   const tab = (value: "login" | "register", label: string) => (
@@ -249,6 +256,19 @@ export default function LoginPage() {
                 </>
               )}
             </Button>
+
+            {DEMO_EMAIL && DEMO_PASSWORD && (
+              <Button
+                type="button"
+                variant="outline"
+                size="lg"
+                disabled={busy}
+                className="w-full"
+                onClick={() => void signIn(() => login(DEMO_EMAIL, DEMO_PASSWORD))}
+              >
+                Try the demo account (sample notes loaded)
+              </Button>
+            )}
           </form>
         </Card>
       </main>

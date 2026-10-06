@@ -7,7 +7,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Literal
 
-from pydantic import Field, model_validator
+from pydantic import Field, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 BACKEND_DIR = Path(__file__).resolve().parents[2]
@@ -116,6 +116,15 @@ class Settings(BaseSettings):
     @property
     def max_upload_bytes(self) -> int:
         return self.max_upload_mb * 1024 * 1024
+
+    @field_validator("database_url")
+    @classmethod
+    def _use_psycopg_driver(cls, v: str) -> str:
+        # Hosted Postgres (Neon, Supabase) hands out plain postgresql:// URLs.
+        for prefix in ("postgresql://", "postgres://"):
+            if v.startswith(prefix):
+                return "postgresql+psycopg://" + v[len(prefix) :]
+        return v
 
     @model_validator(mode="after")
     def _check_production_safety(self) -> "Settings":
