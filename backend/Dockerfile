@@ -28,6 +28,13 @@ USER app
 ENV PATH="/app/.venv/bin:$PATH" \
     UPLOAD_DIR=/data/uploads
 
+# Hosts without a persistent disk (e.g. Render free) set PRELOAD_MODELS=true so the embedding
+# model ships inside the image instead of downloading on every cold start.
+ARG PRELOAD_MODELS=false
+RUN if [ "$PRELOAD_MODELS" = "true" ]; then \
+        python -c "from fastembed import TextEmbedding; TextEmbedding('BAAI/bge-small-en-v1.5', cache_dir='/models')"; \
+    fi
+
 EXPOSE 8000
 HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
     CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')" || exit 1

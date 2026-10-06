@@ -4,7 +4,7 @@
 If the answer isn't in your documents, it says *"I don't know based on your documents."*
 instead of guessing.
 
-**[Live demo](https://techprep-ai.onrender.com)** · click *Try the demo account* (the free backend may take ~1 min to wake up)
+**[Live demo](https://techprep-ai-jgcv.onrender.com)** · click *Try the demo account* (the free backend may take ~1 min to wake up)
 
 ![CI](https://github.com/SRASHTI2004/TechPrep-AI/actions/workflows/ci.yml/badge.svg)
 ![Python](https://img.shields.io/badge/python-3.12-blue)

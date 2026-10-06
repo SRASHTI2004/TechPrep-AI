@@ -33,8 +33,8 @@ temporary disk, but chunks and embeddings live in Neon, so chat and summaries ke
    | techprep-ai-api | `DATABASE_URL` | the Neon connection string |
    | techprep-ai-api | `GEMINI_API_KEY` | your Gemini key |
    | techprep-ai-api | `GROQ_API_KEY` | your Groq key |
-   | techprep-ai-api | `CORS_ORIGINS` | `https://techprep-ai.onrender.com` (the frontend URL, no trailing slash) |
-   | techprep-ai | `VITE_API_URL` | `https://techprep-ai-api.onrender.com` |
+   | techprep-ai-api | `CORS_ORIGINS` | `https://techprep-ai-jgcv.onrender.com` (the frontend URL, no trailing slash) |
+   | techprep-ai | `VITE_API_URL` | `https://techprep-ai-api-jgcv.onrender.com` |
    | techprep-ai | `VITE_DEMO_EMAIL` | `demo@techprep.ai` (optional, shows a "Try the demo" button) |
    | techprep-ai | `VITE_DEMO_PASSWORD` | the demo password |
 
