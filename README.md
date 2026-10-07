@@ -265,6 +265,10 @@ and trim each section evenly beyond ~48k characters; summaries are not covered b
 Voice input uses the browser's speech service (Chrome sends audio to Google; Firefox has none).
 A stopped answer is not saved.
 
+## Author
+
+Built by **Srashti Choudhary** · [GitHub](https://github.com/SRASHTI2004)
+
 ## License
 
 Code: MIT ([LICENSE](LICENSE)). Sample corpus: third-party content under its own licenses, see
