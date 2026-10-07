@@ -30,9 +30,7 @@ and free-tier LLMs (Gemini primary, Groq fallback).
 </table>
 
 <p align="center">
-  <img src="docs/screenshots/mobile-chat.png" alt="Chat on a phone" width="240">
-  &nbsp;
-  <img src="docs/screenshots/mobile-sources.png" alt="Sources sheet on a phone" width="240">
+  <img src="docs/screenshots/mobile-chat.png" alt="Chat on a phone" width="260">
 </p>
 
 <sub>Screenshots come from the real production build with sample data

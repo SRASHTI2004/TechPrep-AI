@@ -202,7 +202,7 @@ try {
     await page.close();
   }
 
-  // 6. Mobile: chat, then the sources sheet
+  // 6. Mobile: chat
   {
     const mobile = { viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true };
     const page = await browser.newPage(mobile);
@@ -212,9 +212,6 @@ try {
     await page.getByText("Main disadvantages").waitFor();
     await page.locator("div[aria-live=polite]").evaluate((el) => (el.scrollTop = 0));
     await shot(page, "mobile-chat");
-    await page.getByRole("button", { name: /Show source 2/ }).first().click();
-    await page.getByRole("dialog", { name: "Sources" }).waitFor();
-    await shot(page, "mobile-sources");
     await page.close();
   }
 
