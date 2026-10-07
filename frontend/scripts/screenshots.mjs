@@ -202,19 +202,6 @@ try {
     await page.close();
   }
 
-  // 6. Mobile: chat
-  {
-    const mobile = { viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true };
-    const page = await browser.newPage(mobile);
-    await setTheme(page, "light");
-    await mockApi(page);
-    await page.goto(`${BASE}/chat/c1`);
-    await page.getByText("Main disadvantages").waitFor();
-    await page.locator("div[aria-live=polite]").evaluate((el) => (el.scrollTop = 0));
-    await shot(page, "mobile-chat");
-    await page.close();
-  }
-
   await browser.close();
 } finally {
   preview.kill();

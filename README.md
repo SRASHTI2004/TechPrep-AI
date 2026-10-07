@@ -29,10 +29,6 @@ and free-tier LLMs (Gemini primary, Groq fallback).
   </tr>
 </table>
 
-<p align="center">
-  <img src="docs/screenshots/mobile-chat.png" alt="Chat on a phone" width="260">
-</p>
-
 <sub>Screenshots come from the real production build with sample data
 (`cd frontend && npm run build && npm run screenshots`, which mocks the API, so no backend or LLM is needed).</sub>
 
